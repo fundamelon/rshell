@@ -19,14 +19,8 @@ $(ODIR)%.o: %.cpp
 	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
 
 rshell: $(OBJ)
-	$(CXX) -o mctest $(OBJ) $(CXXFLAGS) 
+	$(CXX) -o rshell $(OBJ) $(CXXFLAGS) 
 	
-
-.PHONY: test
-test:
-	make
-#	clear
-	./rshell -A -B
 
 .PHONY: clean
 clean: 
