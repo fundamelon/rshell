@@ -1,6 +1,8 @@
 // RSHELL.CPP
 // Main source code for rshell
 
+#define RSHELL_DEBUG
+
 #include "unistd.h"
 #include "sys/wait.h"
 #include "stdio.h"
@@ -15,8 +17,6 @@
 #include <boost/regex.hpp>
 
 #include "rshell.h"
-
-#define RSHELL_DEBUG
 
 const char* CONN_AMP = "&&";
 const char* CONN_PIPE = "||";
@@ -67,7 +67,10 @@ int run() {
             // exit only if first word is "exit", after formatting
             if(tokens_word.at(0) == "exit") return 0;
             
-            execute(cmd_argv[0], cmd_argv.data());
+            int err_num = execute(cmd_argv[0], cmd_argv.data());
+    
+            // if execvp returned and had error, stop the process
+            if(err_num == 1) return 1;
         }
     }
     
@@ -75,9 +78,14 @@ int run() {
 }
 
 
-/* Prints the prompt symbol and takes in raw command line input */
+/* Prints prompt text and takes in raw command line input */
 std::string prompt() {
+    
+    char hostname[HOST_NAME_MAX];
+    if(gethostname(hostname, HOST_NAME_MAX) == -1)
+        perror("gethostname");
 
+    std::cout << getlogin() << "@" << hostname;
     std::cout << "$ " << std::flush;
 
     std::string input_raw;
@@ -87,15 +95,21 @@ std::string prompt() {
 }
 
 
-/* Basically a wrapper for execvp, has error checking */
+/* fork and exec a program, complete error checking */
 int execute(const char* path, char* const argv[]) {
 
 #ifdef RSHELL_DEBUG
     std::cout << "executing " << path << std::endl;
 #endif
+    
     int pid = fork();
+
+#ifdef RSHELL_DEBUG
+    std::cout << "created process with id " << pid << std::endl;
+#endif
+
     if(pid == -1) {
-        perror(NULL);
+        perror("fork");
         return -1;
     } else if(pid == 0) {
         execvp(path, argv);
@@ -103,7 +117,7 @@ int execute(const char* path, char* const argv[]) {
         return 1;
     } else {
         if(waitpid(pid, NULL, 0) == -1)
-            perror(NULL);
+            perror("waitpid");
     }
 
     return 0;
