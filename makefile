@@ -1,11 +1,14 @@
 
 CXX = g++
-CXXFLAGS = -W -Wall -pedantic -ansi 
+CXXFLAGS = -Wall -Werror -ansi -pedantic 
 
 MKDIR_P = mkdir -p
 ODIR = bin/
+SDIR = src/
 
-_OBJ = main.o 
+_CPP = $(wildcard src/*.cpp)
+
+_OBJ = main.o rshell.o
 OBJ = $(addprefix $(ODIR), $(_OBJ) )
 
 
@@ -13,14 +16,14 @@ OBJ = $(addprefix $(ODIR), $(_OBJ) )
 all:
 	$(MKDIR_P) $(ODIR)
 	make rshell
-	
 
-$(ODIR)%.o: %.cpp
-	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
 
 rshell: $(OBJ)
 	$(CXX) -o rshell $(OBJ) $(CXXFLAGS) 
 	
+$(ODIR)%.o: $(SDIR)%.cpp
+	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
+
 
 .PHONY: clean
 clean: 

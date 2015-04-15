@@ -1,3 +1,3 @@
 # rshell
 
-A simple command shell modeled after gnu bash.
+A simple command shell *sorta* modeled after gnu bash.
