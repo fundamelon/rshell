@@ -5,6 +5,8 @@
 #define RSHELL_H
 
 void init();
-void prompt();
+int run();
+
+std::string prompt();
 
 #endif

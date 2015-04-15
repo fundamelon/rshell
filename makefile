@@ -19,7 +19,7 @@ all:
 
 
 rshell: $(OBJ)
-	$(CXX) -o rshell $(OBJ) $(CXXFLAGS) 
+	$(CXX) -o $(ODIR)rshell $(OBJ) $(CXXFLAGS) 
 	
 $(ODIR)%.o: $(SDIR)%.cpp
 	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
