@@ -1,6 +1,7 @@
 
 CXX = g++
 CXXFLAGS = -Wall -Werror -ansi -pedantic 
+BOOSTFLAGS = -lboost_regex
 
 MKDIR_P = mkdir -p
 ODIR = bin/
@@ -19,7 +20,7 @@ all:
 
 
 rshell: $(OBJ)
-	$(CXX) -o $(ODIR)rshell $(OBJ) $(CXXFLAGS) 
+	$(CXX) -o $(ODIR)rshell $(OBJ) $(BOOSTFLAGS) $(CXXFLAGS) 
 	
 $(ODIR)%.o: $(SDIR)%.cpp
 	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
