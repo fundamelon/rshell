@@ -7,13 +7,10 @@
 
 #include "rshell.h"
 
-//#define DEBUG
-
 
 int main(int argc, char** argv) {
 
-    // debug
-#ifdef DEBUG
+#ifdef RSHELL_DEBUG
     for(int i = 0; i < argc; i++)
         std::cout << argv[i] << std::endl;
 #endif
