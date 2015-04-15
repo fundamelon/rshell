@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include <iostream>
+#include <vector>
 
 #include "rshell.h"
 
@@ -19,14 +20,14 @@ int main(int argc, char** argv) {
 
     int err_code = run();
 
-    if(err_code != 0) std::cout << "rshell: error: ";
+    if(err_code != 0) std::cout << "error: ";
 
     switch(err_code) {
         case 0:
             // no error
             break;
         default:
-            std::cout << "Unknown error.";
+            std::cout << "unknown error";
     }
 /*
     if(argc > 1) {
