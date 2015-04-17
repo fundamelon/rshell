@@ -45,6 +45,8 @@ int run() {
             std::cout << "<" << tokens_conn.at(i) << ">" << std::endl;
 #endif
 
+            if(tokens_conn.at(i) == "") continue;
+
             tokens_word = toksplit(tokens_conn.at(i), " ");
             for(unsigned int j = 0; j < tokens_word.size(); j++) {
                 
@@ -135,7 +137,33 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
 
     std::vector<std::string> token_vec;
  
-    boost::algorithm::split_regex(token_vec, s, boost::regex(r));
+//    boost::algorithm::split_regex(token_vec, s, boost::regex(r));
+   
+    // This part's hacky - it does a secondary regex on the string to 
+    //  search for connectors, then inserts them in between tokens.
+    std::string::const_iterator s_start, s_end;
+    s_start = s.begin();
+    s_end = s.end();
+
+    boost::match_results<std::string::const_iterator> results;
+    boost::match_flag_type flags = boost::match_default;
+    while(boost::regex_search(s_start, s_end, results, boost::regex(r), flags)) {
+        std::cout << "MATCHED: " << results[0] << std::endl;
+
+        token_vec.push_back(std::string(s_start, results[0].second));
+        token_vec.push_back(results[0]);
+        
+        s_start = results[0].second;
+        flags |= boost::match_prev_avail;
+        flags |= boost::match_not_bob;
+    }
+
+    token_vec.push_back(std::string(s_start, s_end));
+
+#ifdef RSHELL_DEBUG
+    for(unsigned int i = 0; i < token_vec.size(); i++) std::cout << "<" << token_vec.at(i) << ">" << std::endl; 
+#endif
+
     return token_vec;
 }
 
