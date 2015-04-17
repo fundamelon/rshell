@@ -1,7 +1,7 @@
 // RSHELL.CPP
 // Main source code for rshell
 
-#define RSHELL_DEBUG
+//#define RSHELL_DEBUG
 
 #include "unistd.h"
 #include "sys/wait.h"
@@ -46,6 +46,13 @@ int run() {
 #endif
 
             if(tokens_conn.at(i) == "") continue;
+
+            // assumption: a connector token has no whitespace
+            if(     tokens_conn.at(i) == std::string(CONN_AMP) ||
+                    tokens_conn.at(i) == std::string(CONN_PIPE) ||
+                    tokens_conn.at(i) == std::string(CONN_SEMIC)   ) {
+                continue;
+            }
 
             tokens_word = toksplit(tokens_conn.at(i), " ");
             for(unsigned int j = 0; j < tokens_word.size(); j++) {
@@ -148,9 +155,8 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
     boost::match_results<std::string::const_iterator> results;
     boost::match_flag_type flags = boost::match_default;
     while(boost::regex_search(s_start, s_end, results, boost::regex(r), flags)) {
-        std::cout << "MATCHED: " << results[0] << std::endl;
 
-        token_vec.push_back(std::string(s_start, results[0].second));
+        token_vec.push_back(std::string(s_start, results[0].first));
         token_vec.push_back(results[0]);
         
         s_start = results[0].second;
@@ -161,7 +167,7 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
     token_vec.push_back(std::string(s_start, s_end));
 
 #ifdef RSHELL_DEBUG
-    for(unsigned int i = 0; i < token_vec.size(); i++) std::cout << "<" << token_vec.at(i) << ">" << std::endl; 
+    for(unsigned int i = 0; i < token_vec.size(); i++) std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
 #endif
 
     return token_vec;
