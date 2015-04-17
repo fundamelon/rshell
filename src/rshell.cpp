@@ -167,8 +167,6 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
  
 //    boost::algorithm::split_regex(token_vec, s, boost::regex(r));
    
-    // This part's hacky - it does a secondary regex on the string to 
-    //  search for connectors, then inserts them in between tokens.
     std::string::const_iterator s_start, s_end;
     s_start = s.begin();
     s_end = s.end();
