@@ -33,6 +33,7 @@ int run() {
     std::vector<std::string> tokens_conn;
     std::vector<std::string> tokens_word;
     std::string usr_input;
+    int prev_exit_code = 0;
 
     while(true) {
         
@@ -40,7 +41,7 @@ int run() {
 
         tokens_conn = tokenize(usr_input, "(\\|\\||\\&\\&|;)");
         for(unsigned int i = 0; i < tokens_conn.size(); i++) {
-
+//            std::cout << prev_exit_code << std::endl;
 #ifdef RSHELL_DEBUG
             std::cout << "<" << tokens_conn.at(i) << ">" << std::endl;
 #endif
@@ -48,10 +49,23 @@ int run() {
             if(tokens_conn.at(i) == "") continue;
 
             // assumption: a connector token has no whitespace
-            if(     tokens_conn.at(i) == std::string(CONN_AMP) ||
-                    tokens_conn.at(i) == std::string(CONN_PIPE) ||
-                    tokens_conn.at(i) == std::string(CONN_SEMIC)   ) {
-                continue;
+            if(         tokens_conn.at(i) == std::string(CONN_AMP)) {
+                if(prev_exit_code != 0  && i != 0) break;
+                else if(i == 0) {  
+                    std::cout << "syntax error: unexpected token \"" << CONN_AMP << "\"\n";
+                    break;
+                } else continue;
+            } else if(  tokens_conn.at(i) == std::string(CONN_PIPE)) {
+                if(prev_exit_code == 0 && i != 0) break;
+                else if(i == 0) { 
+                    std::cout << "syntax error: unexpected token \"" << CONN_PIPE << "\"\n";
+                    break;
+                } else continue;
+            } else if(  tokens_conn.at(i) == std::string(CONN_SEMIC)) {
+                if(i == 0)  {
+                    std::cout << "syntax error: unexpected token \"" << CONN_SEMIC << "\"\n";
+                    break;
+                } else continue;
             }
 
             tokens_word = toksplit(tokens_conn.at(i), " ");
@@ -65,6 +79,9 @@ int run() {
                 boost::trim_if(word, boost::is_any_of(" \t"));
             }
            
+            // if ls is invoked, add colors flag
+            if(tokens_word.at(0) == "ls") tokens_word.push_back("--color");
+            
             std::vector<char*> cmd_argv(tokens_word.size() + 1);
             for(unsigned int k = 0; k < tokens_word.size(); k++) { 
                cmd_argv[k] = &tokens_word[k][0]; 
@@ -75,11 +92,11 @@ int run() {
 
             // exit only if first word is "exit", after formatting
             if(tokens_word.at(0) == "exit") return 0;
-            
-            int err_num = execute(cmd_argv[0], cmd_argv.data());
+
+            prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
     
             // if execvp returned and had error, stop the process
-            if(err_num == 1) return 1;
+          //  if(err_num == 1) return 1;
         }
     }
     
@@ -123,10 +140,14 @@ int execute(const char* path, char* const argv[]) {
     } else if(pid == 0) {
         execvp(path, argv);
         perror(path);
-        return 1;
+        exit(1);
     } else {
-        if(waitpid(pid, NULL, 0) == -1)
-            perror("waitpid");
+
+        int exit_code; 
+        
+        // pass exit code along
+        if(waitpid(pid, &exit_code, 0) == -1) perror("waitpid");
+        return exit_code;    
     }
 
     return 0;
@@ -166,10 +187,16 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
 
     token_vec.push_back(std::string(s_start, s_end));
 
-#ifdef RSHELL_DEBUG
-    for(unsigned int i = 0; i < token_vec.size(); i++) std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
-#endif
+    // scrub vector of empty fields
+        
 
+    for(unsigned int i = 0; i < token_vec.size(); i++) {
+#ifdef RSHELL_DEBUG
+        std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
+#endif
+        if(token_vec.at(i) == "") token_vec.erase(token_vec.begin() + i);
+    } 
+        
     return token_vec;
 }
 
