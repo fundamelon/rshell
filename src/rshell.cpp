@@ -2,6 +2,8 @@
 // Main source code for rshell
 
 //#define RSHELL_DEBUG
+// prepend "[RSHELL]" to prompt, helps to differ from bash
+//#define RSHELL_PREPEND
 
 #include "unistd.h"
 #include "sys/wait.h"
@@ -21,6 +23,7 @@
 const char* CONN_AMP = "&&";
 const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
+const char* TOK_COMMENT = "#";
  
 
 /* Initialize environment */
@@ -39,7 +42,7 @@ int run() {
         
         usr_input = prompt();
 
-        tokens_conn = tokenize(usr_input, "(\\|\\||\\&\\&|;)");
+        tokens_conn = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
         for(unsigned int i = 0; i < tokens_conn.size(); i++) {
 //            std::cout << prev_exit_code << std::endl;
 #ifdef RSHELL_DEBUG
@@ -66,6 +69,8 @@ int run() {
                     std::cout << "syntax error: unexpected token \"" << CONN_SEMIC << "\"\n";
                     break;
                 } else continue;
+            } else if(  tokens_conn.at(i) == std::string(TOK_COMMENT)) {
+                break;
             }
 
             tokens_word = toksplit(tokens_conn.at(i), " ");
@@ -110,6 +115,10 @@ std::string prompt() {
     char hostname[HOST_NAME_MAX];
     if(gethostname(hostname, HOST_NAME_MAX) == -1)
         perror("gethostname");
+    
+#ifdef RSHELL_PREPEND
+    std::cout << "[RSHELL] ";
+#endif
 
     std::cout << getlogin() << "@" << hostname;
     std::cout << "$ " << std::flush;
