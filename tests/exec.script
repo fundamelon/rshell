@@ -1,0 +1,122 @@
+Script started on Sun 19 Apr 2015 05:06:36 PM PDT
+~
+ichor001@hammer $ cd csa[K100/rshell
+~/cs100/rshell
+ichor001@hammer $ make clean && make && bin/rshell
+rm -f *.o *.d rshell *~
+rm -rf bin/
+mkdir -p bin/
+make rshell
+make[1]: Entering directory `/home/csmajs/ichor001/cs100/rshell'
+g++ -MMD -c -o bin/main.o src/main.cpp -Wall -Werror -ansi -pedantic 
+g++ -MMD -c -o bin/rshell.o src/rshell.cpp -Wall -Werror -ansi -pedantic 
+g++ -o bin/rshell bin/main.o bin/rshell.o -lboost_regex -Wall -Werror -ansi -pedantic  
+make[1]: Leaving directory `/home/csmajs/ichor001/cs100/rshell'
+ichor001@hammer.cs.ucr.edu$ echo "Hell o       Hello world!
+Hello world!
+ichor001@hammer.cs.ucr.edu$ ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ ls -a
+[0m[01;34m.[0m   [01;34mbin[0m   .gitignore  makefile   [01;34msrc[0m
+[01;34m..[0m  [01;34m.git[0m  LICENSE     README.md  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ # Time to o comment               Basic functionality!                    c i'm here to comment on everythig ng
+ichor001@hammer.cs.ucr.edu$ #let's get started                 -----------------------
+ichor001@hammer.cs.ucr.edu$    ls    -a   ;
+[0m[01;34m.[0m   [01;34mbin[0m   .gitignore  makefile   [01;34msrc[0m
+[01;34m..[0m  [01;34m.git[0m  LICENSE     README.md  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ # large whitespace
+ichor001@hammer.cs.ucr.edu$ ls -a;  ls-a    #no whitespace
+[0m[01;34m.[0m   [01;34mbin[0m   .gitignore  makefile   [01;34msrc[0m
+[01;34m..[0m  [01;34m.git[0m  LICENSE     README.md  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ ls-a;#ops   to  obviously to littl                  no spaces at all, oops
+ls-a: No such file or directory
+ichor001@hammer.cs.ucr.edu$ ls-dasf    - a||ls -a #               lss||| llls  ||lsss||ls   ##  misspellings
+lss: No such file or directory
+llls: No such file or directory
+lsss: No such file or directory
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ lss&&llls&&lsss&&ls # which       d don't go on
+lss: No such file or directory
+ichor001@hammer.cs.ucr.edu$ true && echo " True!     Success        s  success!
+success!
+ichor001@hammer.cs.ucr.edu$ true || echo failure!
+ichor001@hammer.cs.ucr.edu$ false && ehc      || echo success!
+success!
+ichor001@hammer.cs.ucr.edu$ fla  alse ** e    && echo failure!
+ichor001@hammer.cs.ucr.edu$ true**f   &&false||true&&false||echo Complex success!
+Complex success!
+ichor001@hammer.cs.ucr.edu$ false&&false; echo ignorance         Ignorance!            ignore!
+ichor001@hammer.cs.ucr.edu$ pwd
+/home/csmajs/ichor001/cs100/rshell
+ichor001@hammer.cs.ucr.edu$ && # syntax error
+syntax error: unexpected token "&&"
+ichor001@hammer.cs.ucr.edu$ | #  | # syntax error
+syntax error: unexpected token "||"
+ichor001@hammer.cs.ucr.edu$ ; # syntax error
+syntax error: unexpected token ";"
+ichor001@hammer.cs.ucr.edu$ # comments are fine
+ichor001@hammer.cs.ucr.edu$ ma  make      bin/rshell
+ichor001@hammer.cs.ucr.edu$ ech   ps
+  PID TTY          TIME CMD
+ 8456 pts/48   00:00:00 bash
+ 8552 pts/48   00:00:00 rshell
+10260 pts/48   00:00:00 rshell
+10262 pts/48   00:00:00 ps
+ichor001@hammer.cs.ucr.edu$ echo rshell in rshell
+rshell in rshell
+ichor001@hammer.cs.ucr.edu$ bin/rshell
+ichor001@hammer.cs.ucr.edu$ echo we can go deee                   echo      ps
+  PID TTY          TIME CMD
+ 8456 pts/48   00:00:00 bash
+ 8552 pts/48   00:00:00 rshell
+10260 pts/48   00:00:00 rshell
+10288 pts/48   00:00:00 rshell
+10336 pts/48   00:00:00 ps
+ichor001@hammer.cs.ucr.edu$ exit
+ichor001@hammer.cs.ucr.edu$ exit
+ichor001@hammer.cs.ucr.edu$ ps
+  PID TTY          TIME CMD
+ 8456 pts/48   00:00:00 bash
+ 8552 pts/48   00:00:00 rshell
+10346 pts/48   00:00:00 ps
+ichor001@hammer.cs.ucr.edu$ echo still in rshell      our r first rshell
+still in our first rshell
+ichor001@hammer.cs.ucr.edu$ exit
+~/cs100/rshell
+ichor001@hammer $ ls[K[Kps
+  PID TTY          TIME CMD
+ 8456 pts/48   00:00:00 bash
+10387 pts/48   00:00:00 ps
+~/cs100/rshell
+ichor001@hammer $ exit
+exit
+
+Script done on Sun 19 Apr 2015 05:14:29 PM PDT
+Script started on Sun 19 Apr 2015 05:21:55 PM PDT
+~
+ichor001@hammer $ # appendix to prevoius scrip[K[K[K[K[K[K[K[K[K[Kou[K[Kious script: com[K[K[Kmultiple commands
+~
+ichor001@hammer $ cd c[Kcs100/rshell [K; a[Kmake && [K[K[Kclean && make && bin/rshell
+rm -f *.o *.d rshell *~
+rm -rf bin/
+mkdir -p bin/
+make rshell
+make[1]: Entering directory `/home/csmajs/ichor001/cs100/rshell'
+g++ -MMD -c -o bin/main.o src/main.cpp -Wall -Werror -ansi -pedantic 
+g++ -MMD -c -o bin/rshell.o src/rshell.cpp -Wall -Werror -ansi -pedantic 
+g++ -o bin/rshell bin/main.o bin/rshell.o -lboost_regex -Wall -Werror -ansi -pedantic  
+make[1]: Leaving directory `/home/csmajs/ichor001/cs100/rshell'
+ichor001@hammer.cs.ucr.edu$ false&&fals;    e se; ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ false; false; fla als    alse; false; ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ true; false; ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ false;false;ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+[michor001@hammer.cs.ucr.edu$ exit
+~/cs100/rshell
+ichor001@hammer $ exit
+exit
+
+Script done on Sun 19 Apr 2015 05:22:55 PM PDT
