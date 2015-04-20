@@ -37,6 +37,7 @@ int run() {
     std::vector<std::string> tokens_word;
     std::string usr_input;
     int prev_exit_code = 0;
+    bool skip_cmd = false;
 
     while(true) {
         
@@ -53,14 +54,18 @@ int run() {
 
             // assumption: a connector token has no whitespace
             if(         tokens_conn.at(i) == std::string(CONN_AMP)) {
-                if(prev_exit_code != 0  && i != 0) break;
-                else if(i == 0) {  
+                if(prev_exit_code != 0  && i != 0) {
+                    skip_cmd = true; 
+                    continue;
+                } else if(i == 0) {  
                     std::cout << "syntax error: unexpected token \"" << CONN_AMP << "\"\n";
                     break;
                 } else continue;
             } else if(  tokens_conn.at(i) == std::string(CONN_PIPE)) {
-                if(prev_exit_code == 0 && i != 0) break;
-                else if(i == 0) { 
+                if(prev_exit_code == 0 && i != 0) {
+                    skip_cmd = true;
+                    continue;
+                } else if(i == 0) { 
                     std::cout << "syntax error: unexpected token \"" << CONN_PIPE << "\"\n";
                     break;
                 } else continue;
@@ -68,10 +73,16 @@ int run() {
                 if(i == 0)  {
                     std::cout << "syntax error: unexpected token \"" << CONN_SEMIC << "\"\n";
                     break;
-                } else continue;
+                } else {
+                    prev_exit_code = 0;
+                    skip_cmd = false;
+                    continue;
+                }
             } else if(  tokens_conn.at(i) == std::string(TOK_COMMENT)) {
                 break;
             }
+
+            if(skip_cmd) continue;
 
             tokens_word = toksplit(tokens_conn.at(i), " ");
             for(unsigned int j = 0; j < tokens_word.size(); j++) {
