@@ -13,9 +13,9 @@ To run, invoke ```bin/rshell``` in bash.
 
 ### notes
 
-All basic programs in '''/bin''' are supported. (This means cd does not work, yet.)
+All basic programs in ```/bin``` are supported. (This means cd does not work, yet.)
 
-The bash connectors '''&&''', '''||''', ''';''' are suported and function exactly the same.
+The bash connectors ```&&```, ```||```, ```;``` are suported and function exactly the same.
 
 Connectors at the beginning of a line are treated as syntax errors.
 
@@ -27,8 +27,8 @@ If you want to modify the source code to better understand the logic, defining t
 
 
 This program mostly just invokes stuff in /bin, so it inherits all functionality from them.
-More advanced bash commands aren''t guaranteed to work at all - in fact, they may crash rshell outright.
+More advanced bash commands aren't guaranteed to work at all - in fact, they may crash rshell outright.
 
-Connector syntax and logic was thoroughly tested and all known bugs mended - if you happen to find any wrong behavior, please submit a comment or email me at '''ichor001@ucr.edu'''.
+Connector syntax and logic was thoroughly tested and all known bugs mended - if you happen to find any wrong behavior, please submit a comment or email me at 'ichor001@ucr.edu'.
 
-Don''t ask it to remove itself, strange things will happen.
+Oh and don't ask it to remove itself, strange things will happen.
