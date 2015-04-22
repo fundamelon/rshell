@@ -3,7 +3,10 @@
 
 //#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
-//#define RSHELL_PREPEND
+#define RSHELL_PREPEND
+
+#define COL_DEFAULT "\033[39m"
+#define COL_PREPEND "\033[32m"
 
 #include "unistd.h"
 #include "sys/wait.h"
@@ -20,6 +23,7 @@
 
 #include "rshell.h"
 
+
 const char* CONN_AMP = "&&";
 const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
@@ -33,7 +37,7 @@ void init() {}
 /* Main loop - controls command line, parsing, and execution logic */
 int run() {
    
-    std::vector<std::string> tokens_conn;
+    std::vector<std::string> tokens_spc;
     std::vector<std::string> tokens_word;
     std::string usr_input;
     int prev_exit_code = 0;
@@ -43,17 +47,20 @@ int run() {
         
         usr_input = prompt();
 
-        tokens_conn = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
-        for(unsigned int i = 0; i < tokens_conn.size(); i++) {
+        tokens_spc = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
+        for(unsigned int i = 0; i < tokens_spc.size(); i++) {
 //            std::cout << prev_exit_code << std::endl;
+
+            std::string spc = tokens_spc.at(i);
+
 #ifdef RSHELL_DEBUG
-            std::cout << "<" << tokens_conn.at(i) << ">" << std::endl;
+            std::cout << "<" << spc << ">" << std::endl;
 #endif
 
-            if(tokens_conn.at(i) == "") continue;
+            if(spc == "") continue;
 
             // assumption: a connector token has no whitespace
-            if(         tokens_conn.at(i) == std::string(CONN_AMP)) {
+            if(         spc == std::string(CONN_AMP)) {
                 if(prev_exit_code != 0  && i != 0) {
                     skip_cmd = true; 
                     continue;
@@ -61,7 +68,7 @@ int run() {
                     std::cout << "syntax error: unexpected token \"" << CONN_AMP << "\"\n";
                     break;
                 } else continue;
-            } else if(  tokens_conn.at(i) == std::string(CONN_PIPE)) {
+            } else if(  spc == std::string(CONN_PIPE)) {
                 if(prev_exit_code == 0 && i != 0) {
                     skip_cmd = true;
                     continue;
@@ -69,7 +76,7 @@ int run() {
                     std::cout << "syntax error: unexpected token \"" << CONN_PIPE << "\"\n";
                     break;
                 } else continue;
-            } else if(  tokens_conn.at(i) == std::string(CONN_SEMIC)) {
+            } else if(  spc == std::string(CONN_SEMIC)) {
                 if(i == 0)  {
                     std::cout << "syntax error: unexpected token \"" << CONN_SEMIC << "\"\n";
                     break;
@@ -78,13 +85,13 @@ int run() {
                     skip_cmd = false;
                     continue;
                 }
-            } else if(  tokens_conn.at(i) == std::string(TOK_COMMENT)) {
+            } else if(  spc == std::string(TOK_COMMENT)) {
                 break;
             }
 
             if(skip_cmd) continue;
 
-            tokens_word = toksplit(tokens_conn.at(i), " ");
+            tokens_word = toksplit(spc, " ");
             for(unsigned int j = 0; j < tokens_word.size(); j++) {
                 
                 std::string word = tokens_word.at(j);
@@ -95,8 +102,11 @@ int run() {
                 boost::trim_if(word, boost::is_any_of(" \t"));
             }
            
-            // if ls is invoked, add colors flag
-            if(tokens_word.at(0) == "ls") tokens_word.push_back("--color");
+            // if ls is invoked, print apology 
+            if(tokens_word.at(0) == "ls") {
+                std::cout << "sorry, not implemented yet...\n";
+                continue;
+            }
             
             std::vector<char*> cmd_argv(tokens_word.size() + 1);
             for(unsigned int k = 0; k < tokens_word.size(); k++) { 
@@ -128,8 +138,10 @@ std::string prompt() {
         perror("gethostname");
     
 #ifdef RSHELL_PREPEND
-    std::cout << "[RSHELL] ";
+    std::cout << COL_PREPEND << "[RSHELL] ";
 #endif
+
+    std::cout << COL_DEFAULT;
 
     std::cout << getlogin() << "@" << hostname;
     std::cout << "$ " << std::flush;
