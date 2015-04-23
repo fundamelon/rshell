@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include <ls.h>
+#include "ls.h"
 
 int main(int argc, char** argv) {
     return 0;
