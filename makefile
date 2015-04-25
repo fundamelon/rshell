@@ -1,6 +1,6 @@
 
 CXX = g++
-CXXFLAGS = -Wall -Werror -ansi -pedantic 
+CXXFLAGS = --std=c++11 -Wall -Werror -pedantic 
 BOOSTFLAGS = -lboost_regex
 
 MKDIR_P = mkdir -p
