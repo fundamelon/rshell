@@ -1,4 +1,4 @@
 // LS.H
 // Header file for rshell ls
 
-std::vector<const char*> scandir(const char* path); 
+std::vector<std::string> scandir(const char* path); 
