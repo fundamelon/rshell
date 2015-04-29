@@ -16,8 +16,46 @@
 #include "ls.h"
 
 
+int LS_MODE = 0;
+
+
 int main(int argc, char** argv) {
-    
+
+    std::string cmdflags = "";
+    std::vector<const char*> fileflags;
+
+    // parse input flags
+    for(int i = 1; i < argc; i++)
+        // is a flag
+        if(argv[i][0] == '-')
+            cmdflags.append(&argv[i][1]);
+        // is a file/directory
+        else
+            fileflags.push_back(argv[i]);
+
+    // modify program behavior from flags
+    for(char c : cmdflags)
+        switch(c) {
+            case 'a':
+            LS_MODE |= LS_MODE_SHOWALL;
+            break;
+            
+            case 'R':
+            LS_MODE |= LS_MODE_RECURSIVE;
+            break;
+
+            case 'l':
+            LS_MODE |= LS_MODE_LIST;
+            break;
+
+            default:
+            std::cout << "Invalid option: \'" << c 
+                      << "\'\nSupported flags: -a, -R, -l" << std::endl;
+            exit(1);
+            break;
+        }
+
+
     auto files = scandir(".");
 
     for(auto filename : files)
