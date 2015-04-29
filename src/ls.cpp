@@ -16,14 +16,6 @@
 
 #include "ls.h"
 
-// quick filename comparison function (case and . insensitive)
-bool namecmp(std::string i, std::string j) {
-    std::transform(i.begin(), i.end(), i.begin(), ::tolower);
-    std::transform(j.begin(), j.end(), j.begin(), ::tolower);
-    if(i.size() > 0 && i[0] == '.') i.erase(0, 1);
-    if(j.size() > 0 && j[0] == '.') j.erase(0, 1);
-    return (i < j);
-}
 
 int LS_MODE = 0;
 
@@ -75,6 +67,17 @@ int main(int argc, char** argv) {
 }
 
 
+// quick filename comparison function (. insensitive)
+bool namecmp(std::string i, std::string j) {
+    std::transform(i.begin(), i.end(), i.begin(), ::tolower);
+    std::transform(j.begin(), j.end(), j.begin(), ::tolower);
+    if(i.size() > 1 && i[0] == '.') i.erase(0, 1);
+    if(j.size() > 1 && j[0] == '.') j.erase(0, 1);
+    return (i < j);
+}
+
+
+// take a filepath and print out its contents
 void readloc(const char* path) {
 
     struct stat stat_buf;
@@ -87,15 +90,21 @@ void readloc(const char* path) {
         return;
     }
 
+    // get and sort files within directory
     auto files = scandir(path);
+    std::sort(files.begin(), files.end(), namecmp);
+
     for(auto f : files)
-        std::cout << f << " ";
+        if(LS_MODE & LS_MODE_SHOWALL || f[0] != '.')
+            std::cout << f << "  ";
+        else continue;
 
     std::cout << std::endl;
 }
 
 
-std::vector<const char*> scandir(const char* path) {
+// scan a directory for all contained files
+std::vector<std::string> scandir(const char* path) {
    
 	DIR* dirp;
     if( (dirp = opendir(path)) == NULL) {
@@ -103,7 +112,7 @@ std::vector<const char*> scandir(const char* path) {
         exit(1);
     }
 
-    std::vector<const char*> files;
+    std::vector<std::string> files;
 
     struct dirent* entry;
     errno = 0;
