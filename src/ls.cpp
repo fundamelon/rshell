@@ -36,6 +36,9 @@ int main(int argc, char** argv) {
     if(cmdfiles.size() > 1) 
         LS_MODE |= LS_MODE_MANYFILES;
 
+    // sort cmdfiles alphabetically
+    std::sort(cmdfiles.begin(), cmdfiles.end(), namecmp);
+
     // modify program behavior from flags
     for(char c : cmdflags)
         switch(c) {
@@ -71,8 +74,8 @@ int main(int argc, char** argv) {
 bool namecmp(std::string i, std::string j) {
     std::transform(i.begin(), i.end(), i.begin(), ::tolower);
     std::transform(j.begin(), j.end(), j.begin(), ::tolower);
-    if(i.size() > 1 && i[0] == '.') i.erase(0, 1);
-    if(j.size() > 1 && j[0] == '.') j.erase(0, 1);
+    if(i.size() > 0 && i[0] == '.') i.erase(0, 1);
+    if(j.size() > 0 && j[0] == '.') j.erase(0, 1);
     return (i < j);
 }
 
