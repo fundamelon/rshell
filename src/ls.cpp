@@ -22,16 +22,18 @@ int LS_MODE = 0;
 int main(int argc, char** argv) {
 
     std::string cmdflags = "";
-    std::vector<const char*> fileflags;
+    std::vector<const char*> cmdfiles;
 
     // parse input flags
     for(int i = 1; i < argc; i++)
-        // is a flag
         if(argv[i][0] == '-')
-            cmdflags.append(&argv[i][1]);
-        // is a file/directory
+            cmdflags.append(&argv[i][1]);  // is a flag
         else
-            fileflags.push_back(argv[i]);
+            cmdfiles.push_back(argv[i]);  // is a file
+
+    // flag if multiple files are being requested
+    if(cmdfiles.size() > 1) 
+        LS_MODE |= LS_MODE_MANYFILES;
 
     // modify program behavior from flags
     for(char c : cmdflags)
@@ -55,15 +57,32 @@ int main(int argc, char** argv) {
             break;
         }
 
-
-    auto files = scandir(".");
-
-    for(auto filename : files)
-        std::cout << filename << " ";
-        
-    std::cout << std::endl;
+    if(cmdfiles.empty())
+        readloc(".");
+    else for(auto path : cmdfiles)
+        readloc(path);
 
     return 0;
+}
+
+
+void readloc(const char* path) {
+
+    struct stat stat_buf;
+    if(stat(path, &stat_buf) == -1) { perror("stat"); exit(1); }
+
+    if(S_ISDIR(stat_buf.st_mode)) {
+        if(LS_MODE & LS_MODE_MANYFILES) std::cout << path << ":" << std::endl;
+    } else {
+        std::cout << path << std::endl;
+        return;
+    }
+
+    auto files = scandir(path);
+    for(auto f : files)
+        std::cout << f << " ";
+
+    std::cout << std::endl;
 }
 
 
