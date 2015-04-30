@@ -83,6 +83,8 @@ bool namecmp(std::string i, std::string j) {
 // take a filepath and print out its contents
 void readloc(const char* path) {
 
+//    std::cout << "path: " << path << std::endl;
+
     struct stat stat_buf;
     if(stat(path, &stat_buf) == -1) { perror("stat"); exit(1); }
 
@@ -97,10 +99,16 @@ void readloc(const char* path) {
     auto files = scandir(path);
     std::sort(files.begin(), files.end(), namecmp);
 
-    for(auto f : files)
-        if(LS_MODE & LS_MODE_SHOWALL || f[0] != '.')
-            std::cout << f << "  ";
-        else continue;
+    for(auto f : files) {
+//        std::cout << "file: " << f << std::endl;
+        if(LS_MODE & LS_MODE_SHOWALL || f[0] != '.') {
+            if(LS_MODE & LS_MODE_RECURSIVE) 
+                readloc((std::string(path) + "/" + f).c_str());
+            else
+                std::cout << f << "  ";
+        } else continue;
+
+    }
 
     std::cout << std::endl;
 }
