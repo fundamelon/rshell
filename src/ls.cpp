@@ -37,6 +37,9 @@ int main(int argc, char** argv) {
     if(cmdfiles.size() > 1) 
         LS_MODE |= LS_MODE_MANYFILES;
 
+    // flag that first entry will reset
+    LS_MODE |= LS_MODE_FIRSTENTRY;
+
     // sort cmdfiles alphabetically
     std::sort(cmdfiles.begin(), cmdfiles.end(), namecmp);
 
@@ -83,6 +86,11 @@ bool namecmp(std::string i, std::string j) {
 
 // take a filepath and print out its contents
 void readloc(const char* path) {
+
+    if(!(LS_MODE & LS_MODE_FIRSTENTRY))
+        std::cout << std::endl;
+    else
+        LS_MODE &= ~LS_MODE_FIRSTENTRY;
 
 //    std::cout << "DEBUG: " << path << std::endl;
     if(     LS_MODE & LS_MODE_MANYFILES ||
