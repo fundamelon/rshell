@@ -13,4 +13,4 @@ extern int LS_MODE;
 
 bool namecmp(std::string, std::string);
 void readloc(const char* path);
-std::vector<std::string> scandir(const char* path); 
+int scandir(const char* path, std::vector<std::string> &); 

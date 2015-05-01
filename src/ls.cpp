@@ -92,17 +92,24 @@ void readloc(const char* path) {
     else
         LS_MODE &= ~LS_MODE_FIRSTENTRY;
 
-//    std::cout << "DEBUG: " << path << std::endl;
-    if(     LS_MODE & LS_MODE_MANYFILES ||
-            LS_MODE & LS_MODE_RECURSIVE     ) 
-        std::cout << path << ":" << std::endl;
 
     // get and sort files within directory
-    auto files = scandir(path);
+    std::vector<std::string> files;
+    int scan_status = scandir(path, files);
+    if(scan_status == 1) return;
+    else if(scan_status == 2) {
+        std::cout << path << std::endl;
+        return;
+    }
     std::sort(files.begin(), files.end(), namecmp);
 
     // create container of same type for dirs
     decltype(files) dirs;
+
+    // output nice directory title 
+    if(     LS_MODE & LS_MODE_MANYFILES ||
+            LS_MODE & LS_MODE_RECURSIVE     ) 
+        std::cout << path << ":" << std::endl;
 
     for(auto f : files) {
         
@@ -138,21 +145,19 @@ void readloc(const char* path) {
 
 
 // scan a directory for all contained files
-std::vector<std::string> scandir(const char* path) {
+// return values: 1 - syscall error; 2 - is a file
+int scandir(const char* path, std::vector<std::string> &files) {
    
-    std::vector<std::string> files;
-
     struct stat stat_buf;
-    if(stat(path, &stat_buf) == -1) { perror("stat"); exit(1); }
-    if(!S_ISDIR(stat_buf.st_mode)) {
-//        files.push_back(path);
-        return files;
-    }
+    if(stat(path, &stat_buf) == -1) { perror("stat"); return 1; }
+
+    if(!S_ISDIR(stat_buf.st_mode))
+        return 2;
 
 	DIR* dirp;
     if( (dirp = opendir(path)) == NULL) {
         perror("opendir");
-        exit(1);
+        return 1; 
     }
 
 
@@ -163,13 +168,13 @@ std::vector<std::string> scandir(const char* path) {
     
     if(errno != 0) {
         perror("readdir");
-        exit(1);
+        return 1;
     }
 
-   if(closedir(dirp) == -1) {
+   if(closedir(dirp) != 0) {
         perror("closedir");
-        exit(1);
+        return 1;
     }
 
-    return files;
+    return 0;
 }
