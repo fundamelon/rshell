@@ -84,7 +84,7 @@ bool namecmp(std::string i, std::string j) {
 // take a filepath and print out its contents
 void readloc(const char* path) {
 
-    std::cout << "DEBUG: " << path << std::endl;
+//    std::cout << "DEBUG: " << path << std::endl;
     if(     LS_MODE & LS_MODE_MANYFILES ||
             LS_MODE & LS_MODE_RECURSIVE     ) 
         std::cout << path << ":" << std::endl;
@@ -98,12 +98,13 @@ void readloc(const char* path) {
 
     for(auto f : files) {
         
-        const char* fullpath = (std::string(path) + "/" + f).c_str();
+        std::string fullpath = std::string(path) + "/" + f;
 
+//        std::cout << "DEBUG: <" << fullpath[0] << ">" << std::endl;
 
         //stat the file
         struct stat stat_buf;
-        if(stat(fullpath, &stat_buf) == -1) { perror("stat"); exit(1); }
+        if(stat(fullpath.c_str(), &stat_buf) == -1) { perror("stat"); exit(1); }
        
         // skip hidden files if not in showall mode
         if(f == "." || f == ".." || (!(LS_MODE & LS_MODE_SHOWALL) && f[0] == '.'))
