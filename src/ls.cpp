@@ -14,11 +14,15 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <map>
+#include <utility>
 
 #include "ls.h"
 
 
+
 int LS_MODE = 0;
+
 
 
 int main(int argc, char** argv) {
@@ -26,7 +30,8 @@ int main(int argc, char** argv) {
     std::string cmdflags = "";
     std::vector<const char*> cmdfiles;
 
-    // parse input flags
+
+    // parse input strings 
     for(int i = 1; i < argc; i++)
         if(argv[i][0] == '-')
             cmdflags.append(&argv[i][1]);  // is a flag
@@ -43,7 +48,8 @@ int main(int argc, char** argv) {
     // sort cmdfiles alphabetically
     std::sort(cmdfiles.begin(), cmdfiles.end(), namecmp);
 
-    // modify program behavior from flags
+
+    // set flags accordingly
     for(char c : cmdflags)
         switch(c) {
             case 'a':
@@ -62,8 +68,8 @@ int main(int argc, char** argv) {
             std::cout << "Invalid option: \'" << c 
                       << "\'\nSupported flags: -a, -R, -l" << std::endl;
             exit(1);
-            break;
         }
+
 
     if(cmdfiles.empty())
         readloc(".");
@@ -74,7 +80,8 @@ int main(int argc, char** argv) {
 }
 
 
-// quick filename comparison function (. insensitive)
+
+// quick filename comparison function (leading '.' and case insensitive)
 bool namecmp(std::string i, std::string j) {
     std::transform(i.begin(), i.end(), i.begin(), ::tolower);
     std::transform(j.begin(), j.end(), j.begin(), ::tolower);
@@ -84,9 +91,11 @@ bool namecmp(std::string i, std::string j) {
 }
 
 
+
 // take a filepath and print out its contents
 void readloc(const char* path) {
 
+    // first-run formatting
     if(!(LS_MODE & LS_MODE_FIRSTENTRY))
         std::cout << std::endl;
     else
@@ -96,13 +105,14 @@ void readloc(const char* path) {
     // get and sort files within directory
     std::vector<std::string> files;
     int scan_status = scandir(path, files);
-    if(scan_status == 1) return;
-    else if(scan_status == 2) {
+    if(scan_status == -1) return;
+    else if(scan_status == 1) {
         //std::cout << path << std::endl;
         printinfo(path);
         return;
     }
     std::sort(files.begin(), files.end(), namecmp);
+
 
     // create container of same type for dirs
     decltype(files) dirs;
@@ -112,8 +122,13 @@ void readloc(const char* path) {
             LS_MODE & LS_MODE_RECURSIVE     ) 
         std::cout << path << ":" << std::endl;
 
+    // if listing, output used block total
+    if(LS_MODE & LS_MODE_LIST)
+        std::cout << "total x" << std::endl;
+
+
     // first iteration through filename list
-    for(auto&& f : files) {
+    for(auto &&f : files) {
         
         std::string fullpath = std::string(path) + "/" + f;
 
@@ -133,52 +148,108 @@ void readloc(const char* path) {
         // replace with full path for printing
         f = fullpath;
     }
-/*
-    // second iteration thru filename list
-    for(auto f : files)
-        if(LS_MODE & LS_MODE_SHOWALL ||  f[0] != '.')
-            //std::cout << f << "  ";
-            if(printinfo((std::string(path) + "/" + f).c_str()) == -1)
-                break;
-*/
+
+
+    // send set of filepaths to print
     printinfo(files);
 
-    std::cout << std::endl;
+    // non-list formatting
+    if(!(LS_MODE & LS_MODE_LIST)) std::cout << std::endl;
 
+
+    // recursive step
     if(LS_MODE & LS_MODE_RECURSIVE) 
         for(auto d : dirs)
             readloc((std::string(path) + "/" + d).c_str());
 }
 
 
-int printinfo(const char* path) {
 
-    return printinfo(std::vector<std::string> { path });
+int printinfo(const char* path) {
+    return printinfo({ std::string(path) });
 }
 
 
+            
 int printinfo(std::vector<std::string> paths) {
-    
+
+    std::map<std::string, struct stat> filestats;
+
+    nlink_t max_nlink = 0;
+   
+    // first iteration - collect info, construct map
     for(auto p : paths) {
+
         struct stat stat_buf;
         if(stat(p.c_str(), &stat_buf) == -1) { perror("stat"); return -1; }
+
+        if(stat_buf.st_nlink > max_nlink) max_nlink = stat_buf.st_nlink;
 
         std::string filename(p);
         filename = filename.substr(filename.find_last_of("/\\") + 1);
 
+        filestats.insert(std::make_pair(filename, stat_buf));
+    }
+
+
+    for(auto &fs : filestats) {
+
+        std::string filename = fs.first;
+        struct stat filestat = fs.second;
+
         if(LS_MODE & LS_MODE_SHOWALL || filename[0] != '.') {
-            if(LS_MODE & LS_MODE_LIST) {
-                std::cout << "file info ";
-            }
-        
-            mode_t m = stat_buf.st_mode;
-
+            
+            mode_t m = filestat.st_mode;
+            char typechar;
+            
+            // filetype testing
             if(S_ISREG(m))
-                std::cout << LS_COL_FILE;
+                typechar = '-';
             else if(S_ISDIR(m))
-                std::cout << LS_COL_DIR;
+                typechar = 'd';
+            else if(S_ISCHR(m))
+                typechar = 'c';
+            else if(S_ISBLK(m))
+                typechar = 'b';
+            else if(S_ISFIFO(m))
+                typechar = 'p';
+            else if(S_ISLNK(m))
+                typechar = 'l';
+            else if(S_ISSOCK(m))
+                typechar = 's';
 
-            std::cout << filename << LS_COL_DEFAULT << "  ";
+
+            // list mode formatting
+            if(LS_MODE & LS_MODE_LIST) {
+                std::string rights = "rwxrwxrwx";
+                int mask = m & (S_IRWXU | S_IRWXG | S_IRWXO);
+                for(int i = 0; i < 8; i++)
+                    rights[8-i] = (mask & (1 << i)) ? rights[8-i] : '-';
+
+                std::cout << typechar << rights << " ";
+    
+                nlink_t nlink = filestat.st_nlink;
+                for(unsigned int i = 0; i < max_nlink - nlink; i++)
+                    std::cout << " ";
+
+                std::cout << nlink << " ";
+            }
+    
+            // filetype coloring
+            switch(typechar) {
+                case '-':
+                std::cout << LS_COL_FILE;
+                break;
+
+                case 'd':
+                std::cout << LS_COL_DIR;
+                break;
+
+                default:
+                break;
+            }
+
+           std::cout << filename << LS_COL_DEFAULT << "  ";
  
             if(LS_MODE & LS_MODE_LIST)
                 std::cout << std::endl;
@@ -187,6 +258,7 @@ int printinfo(std::vector<std::string> paths) {
 
     return 0;
 }
+
 
 
 // scan a directory for all contained files
