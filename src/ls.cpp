@@ -81,10 +81,16 @@ int main(int argc, char** argv) {
 
 
 
+struct classnamecmp {
+    bool operator() (const std::string &lhs, const std::string &rhs) const
+        { return namecmp(lhs, rhs); }
+};
+
+
 // quick filename comparison function (leading '.' and case insensitive)
 bool namecmp(std::string i, std::string j) {
-    std::transform(i.begin(), i.end(), i.begin(), ::tolower);
-    std::transform(j.begin(), j.end(), j.begin(), ::tolower);
+    for(char &c : i) c = tolower(c);
+    for(char &c : j) c = tolower(c);
     if(i.size() > 0 && i[0] == '.') i.erase(0, 1);
     if(j.size() > 0 && j[0] == '.') j.erase(0, 1);
     return (i < j);
@@ -173,7 +179,7 @@ int printinfo(const char* path) {
             
 int printinfo(std::vector<std::string> paths) {
 
-    std::map<std::string, struct stat> filestats;
+    std::map<std::string, struct stat, classnamecmp> filestats;
 
     nlink_t max_nlink = 0;
    
@@ -203,11 +209,7 @@ int printinfo(std::vector<std::string> paths) {
             char typechar;
             
             // filetype testing
-            if(S_ISREG(m))
-                typechar = '-';
-            else if(S_ISDIR(m))
-                typechar = 'd';
-            else if(S_ISCHR(m))
+            if(S_ISCHR(m))
                 typechar = 'c';
             else if(S_ISBLK(m))
                 typechar = 'b';
@@ -217,7 +219,11 @@ int printinfo(std::vector<std::string> paths) {
                 typechar = 'l';
             else if(S_ISSOCK(m))
                 typechar = 's';
-
+            else if(S_ISREG(m))
+                typechar = '-';
+            else if(S_ISDIR(m))
+                typechar = 'd';
+            
 
             // list mode formatting
             if(LS_MODE & LS_MODE_LIST) {
@@ -229,7 +235,7 @@ int printinfo(std::vector<std::string> paths) {
                 std::cout << typechar << rights << " ";
     
                 nlink_t nlink = filestat.st_nlink;
-                for(unsigned int i = 0; i < max_nlink - nlink; i++)
+                for(unsigned int i = 0; i < (max_nlink/10) - (nlink/10); i++)
                     std::cout << " ";
 
                 std::cout << nlink << " ";
@@ -248,6 +254,8 @@ int printinfo(std::vector<std::string> paths) {
                 default:
                 break;
             }
+
+            if(filename[0] == '.') std::cout << LS_COL_HIDDEN;
 
            std::cout << filename << LS_COL_DEFAULT << "  ";
  

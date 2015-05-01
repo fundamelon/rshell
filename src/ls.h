@@ -11,10 +11,12 @@ enum LS_MODEFLAGS {
 
 const char* LS_COL_DEFAULT =    "\033[0;39m";
 const char* LS_COL_FILE =       "\033[1;92m";
-const char* LS_COL_DIR =        "\033[0;34;42m";
+const char* LS_COL_DIR =        "\033[1;34m";
+const char* LS_COL_HIDDEN =     "\033[40m";
 
 extern int LS_MODE;
 
+struct classnamecmp;
 bool namecmp(std::string, std::string);
 void readloc(const char* path);
 int printinfo(const char* path);
