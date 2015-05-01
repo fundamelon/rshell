@@ -98,7 +98,8 @@ void readloc(const char* path) {
     int scan_status = scandir(path, files);
     if(scan_status == 1) return;
     else if(scan_status == 2) {
-        std::cout << path << std::endl;
+        //std::cout << path << std::endl;
+        printinfo(path);
         return;
     }
     std::sort(files.begin(), files.end(), namecmp);
@@ -111,11 +112,10 @@ void readloc(const char* path) {
             LS_MODE & LS_MODE_RECURSIVE     ) 
         std::cout << path << ":" << std::endl;
 
-    for(auto f : files) {
+    // first iteration through filename list
+    for(auto&& f : files) {
         
         std::string fullpath = std::string(path) + "/" + f;
-
-//        std::cout << "DEBUG: <" << fullpath[0] << ">" << std::endl;
 
         //stat the file
         struct stat stat_buf;
@@ -127,15 +127,22 @@ void readloc(const char* path) {
         
         // handle as dir or print filename
         if(S_ISDIR(stat_buf.st_mode) && (LS_MODE & LS_MODE_RECURSIVE)) {
-//          files.erase(std::remove(files.begin(), files.end(), f), files.end());
             dirs.push_back(f);
         }
-    }
 
+        // replace with full path for printing
+        f = fullpath;
+    }
+/*
+    // second iteration thru filename list
     for(auto f : files)
         if(LS_MODE & LS_MODE_SHOWALL ||  f[0] != '.')
-            std::cout << f << "  ";
-        
+            //std::cout << f << "  ";
+            if(printinfo((std::string(path) + "/" + f).c_str()) == -1)
+                break;
+*/
+    printinfo(files);
+
     std::cout << std::endl;
 
     if(LS_MODE & LS_MODE_RECURSIVE) 
@@ -144,20 +151,58 @@ void readloc(const char* path) {
 }
 
 
+int printinfo(const char* path) {
+
+    return printinfo(std::vector<std::string> { path });
+}
+
+
+int printinfo(std::vector<std::string> paths) {
+    
+    for(auto p : paths) {
+        struct stat stat_buf;
+        if(stat(p.c_str(), &stat_buf) == -1) { perror("stat"); return -1; }
+
+        std::string filename(p);
+        filename = filename.substr(filename.find_last_of("/\\") + 1);
+
+        if(LS_MODE & LS_MODE_SHOWALL || filename[0] != '.') {
+            if(LS_MODE & LS_MODE_LIST) {
+                std::cout << "file info ";
+            }
+        
+            mode_t m = stat_buf.st_mode;
+
+            if(S_ISREG(m))
+                std::cout << LS_COL_FILE;
+            else if(S_ISDIR(m))
+                std::cout << LS_COL_DIR;
+
+            std::cout << filename << LS_COL_DEFAULT << "  ";
+ 
+            if(LS_MODE & LS_MODE_LIST)
+                std::cout << std::endl;
+        }
+    }
+
+    return 0;
+}
+
+
 // scan a directory for all contained files
-// return values: 1 - syscall error; 2 - is a file
+// return values: -1 - syscall error; 1 - is a file
 int scandir(const char* path, std::vector<std::string> &files) {
    
     struct stat stat_buf;
     if(stat(path, &stat_buf) == -1) { perror("stat"); return 1; }
 
     if(!S_ISDIR(stat_buf.st_mode))
-        return 2;
+        return 1;
 
 	DIR* dirp;
     if( (dirp = opendir(path)) == NULL) {
         perror("opendir");
-        return 1; 
+        return -1; 
     }
 
 
@@ -168,12 +213,12 @@ int scandir(const char* path, std::vector<std::string> &files) {
     
     if(errno != 0) {
         perror("readdir");
-        return 1;
+        return -1;
     }
 
    if(closedir(dirp) != 0) {
         perror("closedir");
-        return 1;
+        return -1;
     }
 
     return 0;

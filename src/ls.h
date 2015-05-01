@@ -9,8 +9,14 @@ enum LS_MODEFLAGS {
     LS_MODE_FIRSTENTRY  = 00100
 };
 
+const char* LS_COL_DEFAULT =    "\033[0;39m";
+const char* LS_COL_FILE =       "\033[1;92m";
+const char* LS_COL_DIR =        "\033[0;34;42m";
+
 extern int LS_MODE;
 
 bool namecmp(std::string, std::string);
 void readloc(const char* path);
+int printinfo(const char* path);
+int printinfo(std::vector<std::string>);
 int scandir(const char* path, std::vector<std::string> &); 
