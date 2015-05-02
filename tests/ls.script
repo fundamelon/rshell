@@ -1,0 +1,1469 @@
+Script started on Fri 01 May 2015 11:53:12 PM PDT
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # simple comparison to ls outpt[Kut
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ ls
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ binl[K/ls
+[1;34mbin[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ ls -a
+[0m[01;34m.[0m  [01;34m..[0m  [01;34mbin[0m  [01;34m.git[0m  .gitignore  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ binl/s[K[K[Kls[K[K/ls -a
+[1;34m[47m.[0;39m  [1;34m[47m..[0;39m  [1;34mbin[0;39m  [1;34m[47m.git[0;39m  [1;92m[47m.gitignore[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ ls -l
+total 24
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [0m[01;34mbin[0m
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 LICENSE
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 makefile
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 README.md
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [01;34msrc[0m
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [01;34mtests[0m
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -l
+total 24
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin[K[K[Kls -R
+.:
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+
+./bin:
+[01;32mls[0m  ls.d  ls.o
+
+./src:
+ls.cpp  ls.h  main.cpp  rshell.cpp  rshell.h
+
+./tests:
+exec.script  ls.script  test.script
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -R
+.:
+[1;34mbin[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+
+./bin:
+[1;92mls[0;39m  [1;92mls.d[0;39m  [1;92mls.o[0;39m  
+
+./src:
+[1;92mls.cpp[0;39m  [1;92mls.h[0;39m  [1;92mmain.cpp[0;39m  [1;92mrshell.cpp[0;39m  [1;92mrshell.h[0;39m  
+
+./tests:
+[1;92mexec.script[0;39m  [1;92mls.script[0;39m  [1;92mtest.script[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # flag handling
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ binls[K[K/ls     -a
+[1;34m[47m.[0;39m  [1;34m[47m..[0;39m  [1;34mbin[0;39m  [1;34m[47m.git[0;39m  [1;92m[47m.gitignore[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -al
+total 40
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+drwxrwxr-x 8 igi igi 4096 May  1 22:27 [1;34m[47m.git[0;39m  
+-rw-rw-r-- 1 igi igi  271 Apr 19 17:40 [1;92m[47m.gitignore[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -lR
+.:
+total 24
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+
+./bin:
+total 340
+-rwxrwxr-x 1 igi igi 106846 May  1 23:52 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi     30 May  1 23:52 [1;92mls.d[0;39m  
+-rw-rw-r-- 1 igi igi 231560 May  1 23:52 [1;92mls.o[0;39m  
+
+./src:
+total 32
+-rw-rw-r-- 1 igi igi 10212 May  1 23:52 [1;92mls.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   657 May  1 17:34 [1;92mls.h[0;39m  
+-rw-rw-r-- 1 igi igi   589 Apr 24 17:17 [1;92mmain.cpp[0;39m  
+-rw-rw-r-- 1 igi igi  6620 Apr 26 20:30 [1;92mrshell.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   347 Apr 19 17:40 [1;92mrshell.h[0;39m  
+
+./tests:
+total 16
+-rw-rw-r-- 1 igi igi 6151 Apr 19 17:40 [1;92mexec.script[0;39m  
+-rw-rw-r-- 1 igi igi 4096 May  1 23:54 [1;92mls.script[0;39m  
+-rw-rw-r-- 1 igi igi  393 Apr 19 17:40 [1;92mtest.script[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # [K[K# all flags, huge output
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -Rl[Kal
+.:
+total 40
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+drwxrwxr-x 8 igi igi 4096 May  1 22:27 [1;34m[47m.git[0;39m  
+-rw-rw-r-- 1 igi igi  271 Apr 19 17:40 [1;92m[47m.gitignore[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+
+./bin:
+total 348
+drwxrwxr-x 6 igi igi   4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi   4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rwxrwxr-x 1 igi igi 106846 May  1 23:52 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi     30 May  1 23:52 [1;92mls.d[0;39m  
+-rw-rw-r-- 1 igi igi 231560 May  1 23:52 [1;92mls.o[0;39m  
+
+./.git:
+total 64
+drwxrwxr-x   6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x   5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x   2 igi igi 4096 Apr 19 17:40 [1;34mbranches[0;39m  
+-rw-rw-r--   1 igi igi  329 May  1 22:27 [1;92mCOMMIT_EDITMSG[0;39m  
+-rw-rw-r--   1 igi igi  314 Apr 30 19:06 [1;92mconfig[0;39m  
+-rw-rw-r--   1 igi igi   73 Apr 19 17:40 [1;92mdescription[0;39m  
+-rw-rw-r--   1 igi igi   94 May  1 11:04 [1;92mFETCH_HEAD[0;39m  
+-rw-rw-r--   1 igi igi   19 Apr 24 20:44 [1;92mHEAD[0;39m  
+drwxrwxr-x   2 igi igi 4096 Apr 19 17:40 [1;34mhooks[0;39m  
+-rw-rw-r--   1 igi igi  880 May  1 22:27 [1;92mindex[0;39m  
+drwxrwxr-x   2 igi igi 4096 Apr 19 17:40 [1;34minfo[0;39m  
+drwxrwxr-x   3 igi igi 4096 Apr 19 17:40 [1;34mlogs[0;39m  
+drwxrwxr-x 142 igi igi 4096 May  1 22:27 [1;34mobjects[0;39m  
+-rw-rw-r--   1 igi igi   41 May  1 22:27 [1;92mORIG_HEAD[0;39m  
+-rw-rw-r--   1 igi igi  173 Apr 19 17:40 [1;92mpacked-refs[0;39m  
+drwxrwxr-x   5 igi igi 4096 Apr 19 17:40 [1;34mrefs[0;39m  
+
+./.git/branches:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/hooks:
+total 48
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rwxrwxr-x 1 igi igi  452 Apr 19 17:40 [1;92mapplypatch-msg.sample[0;39m  
+-rwxrwxr-x 1 igi igi  896 Apr 19 17:40 [1;92mcommit-msg.sample[0;39m  
+-rwxrwxr-x 1 igi igi  189 Apr 19 17:40 [1;92mpost-update.sample[0;39m  
+-rwxrwxr-x 1 igi igi  398 Apr 19 17:40 [1;92mpre-applypatch.sample[0;39m  
+-rwxrwxr-x 1 igi igi 1642 Apr 19 17:40 [1;92mpre-commit.sample[0;39m  
+-rwxrwxr-x 1 igi igi 1352 Apr 19 17:40 [1;92mpre-push.sample[0;39m  
+-rwxrwxr-x 1 igi igi 4898 Apr 19 17:40 [1;92mpre-rebase.sample[0;39m  
+-rwxrwxr-x 1 igi igi 1239 Apr 19 17:40 [1;92mprepare-commit-msg.sample[0;39m  
+-rwxrwxr-x 1 igi igi 3611 Apr 19 17:40 [1;92mupdate.sample[0;39m  
+
+./.git/info:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi  240 Apr 19 17:40 [1;92mexclude[0;39m  
+
+./.git/logs:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi 2308 May  1 22:27 [1;92mHEAD[0;39m  
+drwxrwxr-x 4 igi igi 4096 Apr 24 20:44 [1;34mrefs[0;39m  
+
+./.git/logs/refs:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 3 igi igi 4096 Apr 24 20:44 [1;34mheads[0;39m  
+drwxrwxr-x 3 igi igi 4096 Apr 19 17:40 [1;34mremotes[0;39m  
+
+./.git/logs/refs/heads:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi 1804 May  1 22:27 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi  344 Apr 24 13:28 [1;92mmaster[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:44 [1;34morigin[0;39m  
+
+./.git/logs/refs/heads/origin:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/logs/refs/remotes:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 3 igi igi 4096 Apr 24 20:42 [1;34morigin[0;39m  
+
+./.git/logs/refs/remotes/origin:
+total 24
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi  184 Apr 19 17:40 [1;92mHEAD[0;39m  
+-rw-rw-r-- 1 igi igi 1354 May  1 22:28 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi  299 Apr 28 19:01 [1;92mmaster[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:46 [1;34morigin[0;39m  
+
+./.git/logs/refs/remotes/origin/origin:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/objects:
+total 568
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:39 [1;34m03[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m04[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m06[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m07[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m08[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m0a[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 21:57 [1;34m0b[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m0c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m0e[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m0f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34m10[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m12[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 22:27 [1;34m15[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m16[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m18[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m1b[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m1c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 22:51 [1;34m1d[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:50 [1;34m1e[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m1f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m20[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m25[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34m29[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m2b[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m2d[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m2e[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34m30[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m32[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m35[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m37[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m38[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 22:27 [1;34m3c[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m3d[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m3e[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m3f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 17:07 [1;34m41[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m43[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m45[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m46[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 17:38 [1;34m47[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m4c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m4d[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34m4f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m50[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m51[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 21:56 [1;34m52[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34m54[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m55[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m56[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m57[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m58[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:33 [1;34m59[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34m5a[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m5b[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:50 [1;34m5c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m5f[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 22:27 [1;34m64[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m65[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 17:38 [1;34m67[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 22:51 [1;34m69[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m6d[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m6f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m70[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m73[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34m76[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 22:51 [1;34m77[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m79[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m7c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m82[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m84[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m86[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m87[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:50 [1;34m88[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m89[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 17:38 [1;34m8b[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m8d[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m8e[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m91[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m93[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m94[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m95[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m97[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m98[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:01 [1;34m99[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34m9a[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34m9c[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34m9f[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34ma2[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:37 [1;34ma3[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34ma6[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34ma8[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34maa[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mab[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34mac[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 21:56 [1;34mad[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mae[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mb0[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34mb1[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mb8[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mba[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mbb[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34mbd[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:04 [1;34mbe[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mc1[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 17:38 [1;34mc4[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mc6[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:36 [1;34mc8[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:50 [1;34mc9[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mcb[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 22:53 [1;34mcd[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 22:27 [1;34md0[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 21:56 [1;34md3[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34md4[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34md5[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34md6[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:33 [1;34md8[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34mda[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mdb[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mdc[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mdd[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mde[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mdf[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34me1[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34me5[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34me6[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:37 [1;34me7[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34me9[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mea[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mef[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 28 19:00 [1;34mf0[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mf2[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mf3[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 13:27 [1;34mf6[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mf7[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mfb[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mfc[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 30 19:03 [1;34mfd[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 11:50 [1;34mfe[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34minfo[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:40 [1;34mpack[0;39m  
+
+./.git/objects/03:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  263 Apr 24 20:39 [1;92m80b0a6f457326354f948f1523eebe3656e98aa[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 24 17:07 [1;92m8fcac5f22571cfd3ab244bfecb97ff0d6ed7b0[0;39m  
+
+./.git/objects/04:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 28 19:01 [1;92m9ebc6ee402b56756c2d09e055e9f4ff387619a[0;39m  
+
+./.git/objects/06:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  161 Apr 30 19:03 [1;92m6f1d1d56970a5c57088401cf729524d2d37694[0;39m  
+-r--r--r-- 1 igi igi  328 Apr 19 17:40 [1;92md16a502d97506a65f3239b9862a640926a6f97[0;39m  
+
+./.git/objects/07:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1560 Apr 30 19:03 [1;92mbe2867297216dffd79a5a7ffee024d1cee12bd[0;39m  
+
+./.git/objects/08:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m7bcdb38c1a6e9e3de08d846bb593b689c76f9f[0;39m  
+
+./.git/objects/0a:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  247 Apr 19 17:40 [1;92m5dbb0fb0b6eaea5d4e34c8686514145a8dbb91[0;39m  
+
+./.git/objects/0b:
+total 24
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1274 Apr 19 17:40 [1;92m48c68a8f32ddf82252df4f678161f5f8507924[0;39m  
+-r--r--r-- 1 igi igi  216 May  1 17:40 [1;92m4afc8b9dfce6083dd051eee93bba744e3000c6[0;39m  
+-r--r--r-- 1 igi igi  210 May  1 21:57 [1;92mab847b685872ba1b89976c36bb2d550314ffa6[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92mb17d6c0c3a92368ca803f664566e86ac217137[0;39m  
+
+./.git/objects/0c:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92m24f4154ce7c774cdc86a6745498d9812f3e84c[0;39m  
+-r--r--r-- 1 igi igi  212 Apr 19 17:40 [1;92m5eb2561705eb7fdfbe59ac804d6b2e3152fe5b[0;39m  
+
+./.git/objects/0e:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   99 Apr 19 17:40 [1;92m12aa9738a4588f5ec28de1735ad1f593109c68[0;39m  
+-r--r--r-- 1 igi igi  123 Apr 19 17:40 [1;92m927ab9b201dd730d87361012d26b76abad86f8[0;39m  
+
+./.git/objects/0f:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  304 Apr 19 17:40 [1;92m65e71c1624978893acace907b23b73b3c855ac[0;39m  
+-r--r--r-- 1 igi igi  180 Apr 19 17:40 [1;92ma329acdb86bde7840d226ab4ac2d48a7244851[0;39m  
+
+./.git/objects/10:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  230 Apr 24 13:27 [1;92m697be817f3be759866d1fc56c560a69ab4f7ff[0;39m  
+-r--r--r-- 1 igi igi  205 Apr 19 17:40 [1;92m7cb2ee105742117622c7c84dba7225b06de381[0;39m  
+
+./.git/objects/12:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m1e8f263c02cd88b9012531f0b2bfb5194f3061[0;39m  
+-r--r--r-- 1 igi igi 1580 Apr 30 19:03 [1;92m60e62f306f50570137a555bec24485311d3b63[0;39m  
+-r--r--r-- 1 igi igi  757 Apr 28 19:01 [1;92mcb35cf114df0ed12208cadf5c4f8798412a892[0;39m  
+
+./.git/objects/15:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 May  1 22:27 [1;92m4757ccfd59dbd121fa8ff36b398a3313c33e25[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m9c45c4599c858c01276468a4615c46ed8298e2[0;39m  
+
+./.git/objects/16:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  235 Apr 30 19:03 [1;92m28bc2cf33f1b8fb8e9f2c9b84de7b6c5040ff3[0;39m  
+
+./.git/objects/18:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m89fbb4adc6764cd681ba9e1c376235e4a558ef[0;39m  
+
+./.git/objects/1b:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  299 Apr 19 17:40 [1;92m9f4db135183c436e8c0ab0ad98de5ee3c92507[0;39m  
+
+./.git/objects/1c:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  228 Apr 28 19:01 [1;92mb1c105984eea93c23fbdfc6890029ff761654a[0;39m  
+
+./.git/objects/1d:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  626 Apr 24 22:51 [1;92m8ec440b27265077a668ca17b5296544a0bdd05[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m95f98974d1a9a533cb9b772db821690ee94358[0;39m  
+
+./.git/objects/1e:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  208 May  1 11:50 [1;92m14bd53fc62d3032c11db2436e1a299095e3949[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92mbb43edfa4b53401e2117739d9ba282885dde1c[0;39m  
+
+./.git/objects/1f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92m21041e3661b7b522c60c9537708c838b35f04b[0;39m  
+
+./.git/objects/20:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  228 Apr 30 19:03 [1;92me46752c6975ef35084fb983ac5df88fbeb0f44[0;39m  
+
+./.git/objects/25:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  193 Apr 28 19:01 [1;92me3a3fdafa7153e3168d3801cceeec01ae7e8db[0;39m  
+
+./.git/objects/29:
+total 24
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 24 13:27 [1;92m0d359e602db6dda0438f69581910f0ec540e98[0;39m  
+-r--r--r-- 1 igi igi 1386 Apr 19 17:40 [1;92m658faa1df0882817a6db0d51c20cab4076b830[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m86e91ba7fb27830af10d768c54f2a67a10e211[0;39m  
+-r--r--r-- 1 igi igi  111 Apr 19 17:40 [1;92mff36fc0368b67b9e8e1a7179ed038f38604b9a[0;39m  
+
+./.git/objects/2b:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  243 Apr 19 17:40 [1;92m9ededcb8f4bee92ecb1546d5310776065ed17f[0;39m  
+
+./.git/objects/2d:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92m8b041e82e11a0ffe9607fbd6d935da9d671fd3[0;39m  
+
+./.git/objects/2e:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  177 Apr 28 19:01 [1;92m19ac3b4534954b29429a1c07618e89a925aab7[0;39m  
+-r--r--r-- 1 igi igi  163 Apr 24 13:27 [1;92m686f3fb603065c4b911ff1e1b052bf10850896[0;39m  
+-r--r--r-- 1 igi igi 1336 Apr 30 19:03 [1;92mbf92c95517df8c0acb9984012f3b5f8dc7388c[0;39m  
+
+./.git/objects/30:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 28 19:00 [1;92m9d7809d9513c4370c8c85920e76413e37e7fc2[0;39m  
+
+./.git/objects/32:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1739 Apr 30 19:03 [1;92m5325349e61ca358b9fce808b650d2656fc102e[0;39m  
+-r--r--r-- 1 igi igi 2051 May  1 11:04 [1;92mc96e71946c51e876a85da3946801ff1c2f5251[0;39m  
+
+./.git/objects/35:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2125 Apr 19 17:40 [1;92m6e9b8e4652ba82bcc7ab5660502403dab33c91[0;39m  
+-r--r--r-- 1 igi igi  332 Apr 19 17:40 [1;92ma29e620bb8e0060a7c683017c80ef510e96e5c[0;39m  
+
+./.git/objects/37:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   85 Apr 19 17:40 [1;92m5a07aeffabb5fa528a8d8275306369a5bd7470[0;39m  
+
+./.git/objects/38:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 28 19:01 [1;92m886ba00061ebcdeec21adb57be7b98ca0c07dc[0;39m  
+
+./.git/objects/3c:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 3236 May  1 22:27 [1;92m54a1c32a21b10678028570f96783dd5cd7074b[0;39m  
+
+./.git/objects/3d:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  317 May  1 11:04 [1;92m0e3bec74a2a4fecfacc9dfce516f804ea5c447[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92m1868c6b468a7b85b4dfa49e52e9a7f9e695111[0;39m  
+-r--r--r-- 1 igi igi  437 Apr 19 17:40 [1;92m69b089561d2aa8dfc1d8089aa8b273a3e91d63[0;39m  
+
+./.git/objects/3e:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  212 Apr 19 17:40 [1;92mbe2803ab727831377910b5c345132052f5d47d[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92mde37eaa6e7f6bad512f4e3bae380be34ec787d[0;39m  
+
+./.git/objects/3f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  277 Apr 19 17:40 [1;92ma3caec5f8f4e3061337e65cfa62bc6f74e1388[0;39m  
+
+./.git/objects/41:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 24 17:07 [1;92m026603ea3eaea9fa0f76c8d23ab0db2e3802cc[0;39m  
+
+./.git/objects/43:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  268 Apr 19 17:40 [1;92mb9b43a6fb7a70bcd1acc76e9b9c96b5bcda5f9[0;39m  
+
+./.git/objects/45:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  194 Apr 30 19:03 [1;92md93a45abe307c5f48d98fd818e45902705b248[0;39m  
+
+./.git/objects/46:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  275 Apr 19 17:40 [1;92m32df8c5740005707e6ed16a27313638f25b3da[0;39m  
+-r--r--r-- 1 igi igi  229 Apr 19 17:40 [1;92ma92db57276fb8b84d879fe0421805c6c0cc0f0[0;39m  
+
+./.git/objects/47:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 17:38 [1;92ma091d8a7b149c3c66dcb75fedfba271b409574[0;39m  
+-r--r--r-- 1 igi igi  749 Apr 19 17:40 [1;92mab57566334ce59d9b4fd9af275e2bcab3f90bf[0;39m  
+
+./.git/objects/4c:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92md64884066abb87f1da0b8df9e20b7b65ef039e[0;39m  
+-r--r--r-- 1 igi igi  271 Apr 28 19:00 [1;92mf113af70b876b57fd8719683b9e7c3bb4f44dc[0;39m  
+
+./.git/objects/4d:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1258 Apr 30 19:03 [1;92m2c46a3b7c2313ce8466845e9be1047002e9436[0;39m  
+
+./.git/objects/4f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  166 Apr 24 13:27 [1;92mcd9cd3f27c2dad66c091724867802a5dcd027f[0;39m  
+
+./.git/objects/50:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92m4f737915d078a5064bd32baf298aeafd4adeec[0;39m  
+
+./.git/objects/51:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  750 Apr 19 17:40 [1;92m140c25cf9142cfb11a83c79256b9bf3e2d5f1b[0;39m  
+-r--r--r-- 1 igi igi  176 Apr 19 17:40 [1;92m4ec49f528bdc2ce62458f381b526869aa30da0[0;39m  
+
+./.git/objects/52:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 3093 May  1 21:56 [1;92mba48582d7f4419247bf1afa6911b9c97800b75[0;39m  
+
+./.git/objects/54:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 28 19:00 [1;92m348cbff6f55108841fbd0514424033964d9583[0;39m  
+
+./.git/objects/55:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1837 Apr 19 17:40 [1;92ma24051f46f86846c4f4aba246293c065f42ae7[0;39m  
+
+./.git/objects/56:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m9c1378cbc3f22f242d1c836c21339eed07d997[0;39m  
+
+./.git/objects/57:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  133 Apr 19 17:40 [1;92mb3384db47a42b60cb003480abb07557572e6db[0;39m  
+
+./.git/objects/58:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  259 Apr 30 19:03 [1;92m3032a145e1a5dbf19eb98d6de74f49c2d4b056[0;39m  
+-r--r--r-- 1 igi igi  182 Apr 19 17:40 [1;92m75b6c1d58a34a3006dd4f6f56a1d775c87b6dd[0;39m  
+-r--r--r-- 1 igi igi  194 Apr 19 17:40 [1;92mec42696c80c1eeae511c7d99592ccc6b70d99f[0;39m  
+
+./.git/objects/59:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   95 Apr 24 20:33 [1;92madbab6d8ecd20fe6e7b3de9571c411a47c7ed0[0;39m  
+
+./.git/objects/5a:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  139 Apr 19 17:40 [1;92m10eee38b86b4bc0120a5cfea308acd74ab2f01[0;39m  
+-r--r--r-- 1 igi igi  140 Apr 19 17:40 [1;92ma538dfbe6e8e2269e7ea4be720d9f1d9f17d0e[0;39m  
+-r--r--r-- 1 igi igi  239 Apr 28 19:00 [1;92mb742d771c5841e3ff40e88a315c31495f4758a[0;39m  
+
+./.git/objects/5b:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 11:04 [1;92m9d20c8408173d99858804cb19143b32f59664b[0;39m  
+
+./.git/objects/5c:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 May  1 11:50 [1;92m0763a61c878b9e1be32c4f02814736354924f7[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m1f50b0e6bfe04c6be02343634947357994631d[0;39m  
+-r--r--r-- 1 igi igi 1659 Apr 30 19:03 [1;92m6ca94bb44a6241fe59744b5213f43c5d69ddc5[0;39m  
+
+./.git/objects/5f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  948 Apr 30 19:03 [1;92maea3fb4d8ba757753249e40ab4128d3b7453a9[0;39m  
+
+./.git/objects/64:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  218 May  1 22:27 [1;92m385649d4ce620a8e154a4ef033cbac69f939f1[0;39m  
+
+./.git/objects/65:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  182 Apr 19 17:40 [1;92m9f9f820f02e3d75cb2676d9d7760068ec131f0[0;39m  
+-r--r--r-- 1 igi igi 1775 Apr 19 17:40 [1;92me5c952c5d866287b3f921465283c1ea3719418[0;39m  
+
+./.git/objects/67:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  100 Apr 24 22:51 [1;92mc6fc8f24ea85a72fb74e63d444c69332b79c67[0;39m  
+-r--r--r-- 1 igi igi  211 May  1 17:38 [1;92mee5b780da4c6d03ec7610efb10228a08d49ca9[0;39m  
+
+./.git/objects/69:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 24 22:51 [1;92m86ba80e2eac3bc54a10abef2345f3e533e9a66[0;39m  
+
+./.git/objects/6d:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92mcc6a786f8193cff7c31f35bcdc6bfecb550d8d[0;39m  
+
+./.git/objects/6f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  238 Apr 30 19:03 [1;92m19cb9bc0824ae62fc33ebd708b4953481fbdbc[0;39m  
+
+./.git/objects/70:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m1f4892a4c74d4cd6d8e74e5422aab551b4d28c[0;39m  
+-r--r--r-- 1 igi igi  217 Apr 19 17:40 [1;92m26b005ff51130cc863f2d4ede1fc478b161037[0;39m  
+
+./.git/objects/73:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  161 Apr 30 19:03 [1;92m5eddf55b8637025430f2560e95f09ca5936749[0;39m  
+
+./.git/objects/76:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2304 Apr 24 13:27 [1;92m3f4d56da4b95c6fe49a1575d01b8596863e999[0;39m  
+-r--r--r-- 1 igi igi  660 Apr 19 17:40 [1;92md3628f1ebcf1d0b2d6c815cb7dec5a5b6fea8a[0;39m  
+
+./.git/objects/77:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 24 22:51 [1;92m8c189b9f179939f0ef3c7323affed69379b090[0;39m  
+
+./.git/objects/79:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  181 Apr 19 17:40 [1;92m68b9c8174e6dc397448357aaa139a900df332a[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m93561e167b0e69675341553d91f2b17e16e6b7[0;39m  
+
+./.git/objects/7c:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  255 May  1 11:04 [1;92md3bfc199257fb0454791215735b875b37fc5d7[0;39m  
+
+./.git/objects/82:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92mfb7bdea6c89cfb2e86a4b9b558997508bdf6ea[0;39m  
+
+./.git/objects/84:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  958 Apr 28 19:01 [1;92mfcc3e6d887e297133097818ba6438f3650f4ad[0;39m  
+
+./.git/objects/86:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 19 17:40 [1;92m90af23b8a5524e7b2f0cdeb873105b186548cf[0;39m  
+
+./.git/objects/87:
+total 28
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  163 Apr 28 19:01 [1;92m27c1217b72c64f77411cfaccca57574b335e44[0;39m  
+-r--r--r-- 1 igi igi  128 Apr 24 13:27 [1;92m9b9c2366389c201138dfa97b203479748dc084[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92maa2a2eb43aa26770e26ada9d4ef06cbe944abb[0;39m  
+-r--r--r-- 1 igi igi  341 Apr 24 13:27 [1;92mdfe302aa33d13733724dbc3036d54fcbb617c2[0;39m  
+-r--r--r-- 1 igi igi  237 Apr 30 19:03 [1;92mf6972fbd7c96f6d6736494901e2beadb8d8eb4[0;39m  
+
+./.git/objects/88:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 11:50 [1;92m8801040a169cc077a867d194b511a28715abc9[0;39m  
+
+./.git/objects/89:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2049 Apr 19 17:40 [1;92ma651c0208305b81b0daefa43a5554cecd40612[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92mb5daea0c0a5b647da95b75fafddacb357ae2c3[0;39m  
+
+./.git/objects/8b:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2842 May  1 17:38 [1;92m2bc02be64b2cc696e68582e0651a5488a9a9db[0;39m  
+
+./.git/objects/8d:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  220 Apr 19 17:40 [1;92m43dc734d8255c00dbe46f1d7b43d76893cb3c1[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m71a83b0b2eac64ac9d666d36f65c58dcd9f366[0;39m  
+
+./.git/objects/8e:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  246 Apr 19 17:40 [1;92m4eb0fea1cc80386eae29eab7cdd3388c0dba2e[0;39m  
+
+./.git/objects/91:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  248 Apr 30 19:03 [1;92m478b4e3213032693b9701b24c41c5fd0a46240[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92mfbd26b010850b6844698666d433c43693d0180[0;39m  
+
+./.git/objects/93:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  510 Apr 19 17:40 [1;92mfbf5bcb16cc52e7aed0ec4968d90cb31c0da39[0;39m  
+
+./.git/objects/94:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  216 May  1 11:04 [1;92m30784c9f74f563a24b3439dfa35cfdaf7ff0b0[0;39m  
+
+./.git/objects/95:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92m44687be9572854d8a48096f10b3087cf451ab4[0;39m  
+-r--r--r-- 1 igi igi  137 Apr 19 17:40 [1;92mfcc8462f157cd089bd2137ece55d777719e6bb[0;39m  
+
+./.git/objects/97:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92m11ebbc916a3b0b936fa4a9b6ba94af96c598c8[0;39m  
+
+./.git/objects/98:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92ma548c6e67c6f1fe2c61b731e31a984759e5d1b[0;39m  
+
+./.git/objects/99:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  221 Apr 28 19:01 [1;92mb08ee6e9939aa45bdc038cf48ab5938c4ea5aa[0;39m  
+
+./.git/objects/9a:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 May  1 11:04 [1;92m1b68a98be777034f92503a3718296cee918eae[0;39m  
+-r--r--r-- 1 igi igi  120 Apr 19 17:40 [1;92mc43157c5f82560ef7c84252274ecd66a595a51[0;39m  
+
+./.git/objects/9c:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  248 Apr 19 17:40 [1;92m007109764cf1fccb5f3a80167210ccfec10d2e[0;39m  
+
+./.git/objects/9f:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  195 Apr 30 19:03 [1;92m53dd172ea197e9739e1b194c9c905342bab9f0[0;39m  
+
+./.git/objects/a2:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92me0e0fabe0b622ed177fdc496affcadef5d271f[0;39m  
+
+./.git/objects/a3:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   70 Apr 19 17:40 [1;92m63b03e60c3f62da9c8548c905558b16b2414a7[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 24 20:37 [1;92mf22b367131980c8aeb40bc029a270f4610bf59[0;39m  
+
+./.git/objects/a6:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   56 Apr 19 17:40 [1;92me9e28ce0fdfb3cff1935e7eb5e8bdcab378f86[0;39m  
+
+./.git/objects/a8:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  278 Apr 19 17:40 [1;92m2b0512e2fa8202d214efdf2b1d6eb216204482[0;39m  
+
+./.git/objects/aa:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  175 Apr 19 17:40 [1;92m8ddd788b14edb5b4e05b6b40cd557ab85efc1b[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 11:04 [1;92mc13c58d5a81e37a0d69502e2cd77c055ce19b2[0;39m  
+-r--r--r-- 1 igi igi   53 Apr 24 13:27 [1;92mf15429aad811ea84f579de82ac69b75ce7d75f[0;39m  
+
+./.git/objects/ab:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  203 Apr 30 19:03 [1;92mcf5f1b82c0b29085746ff6e51d86567d8fdfb9[0;39m  
+
+./.git/objects/ac:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  764 Apr 28 19:00 [1;92mc4221f7372588cf4c30c3d463aea018d658f54[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 24 13:27 [1;92me09691b0561af449836230324aa9c360a0e727[0;39m  
+
+./.git/objects/ad:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 May  1 21:56 [1;92m14c81361f687dca572f4f6f393ea7457cb4540[0;39m  
+-r--r--r-- 1 igi igi  356 Apr 24 17:06 [1;92m220e12e4533d75c41fd14d515ac540de07370b[0;39m  
+-r--r--r-- 1 igi igi  173 Apr 19 17:40 [1;92m47ed198bc18e9725f7d753d8f855f9d5e10ebe[0;39m  
+
+./.git/objects/ae:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2220 Apr 19 17:40 [1;92mb8cd3794328dc420c1e5b20813f2d91d838050[0;39m  
+
+./.git/objects/b0:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  273 Apr 19 17:40 [1;92m138134aa7f9c4261f25fb309baf29c70659f05[0;39m  
+
+./.git/objects/b1:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 24 13:27 [1;92mdc8437cbb988fcb3934911f76093d83e32b5b2[0;39m  
+
+./.git/objects/b8:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  163 Apr 19 17:40 [1;92mbd0267bdf1a5e02793430b53cbbebd6c257f6f[0;39m  
+
+./.git/objects/ba:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  227 Apr 30 19:03 [1;92mcf0377154f3f4af76431fc0db38372168866ce[0;39m  
+
+./.git/objects/bb:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  201 Apr 19 17:40 [1;92mb6eda73d91dffd828b0eeab5fecc7df93b1b82[0;39m  
+
+./.git/objects/bd:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 May  1 11:04 [1;92m070ecefa83113d6a0705c4f68268df4c9e1e11[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92m36a1533c66f849aa05590b3ac5703d54bf573b[0;39m  
+
+./.git/objects/be:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2561 May  1 11:04 [1;92mb2e10581301a27615c2ae6f8ea68a18cee6533[0;39m  
+-r--r--r-- 1 igi igi  222 Apr 19 17:40 [1;92md138616db4c1fa6853a0993869ce644d1ae5ae[0;39m  
+
+./.git/objects/c1:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92meca15718954917d85737787bba20082e2b4fcc[0;39m  
+
+./.git/objects/c4:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  340 May  1 17:38 [1;92m416ca5cb4249451d1befae9172e4c99db0e641[0;39m  
+
+./.git/objects/c6:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  223 Apr 19 17:40 [1;92m933b0c566a19fb75be906dcb4feeb415a13b89[0;39m  
+
+./.git/objects/c8:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  438 Apr 24 20:36 [1;92m7ee010a4de80628dc55701b701bc3d1014800f[0;39m  
+
+./.git/objects/c9:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2639 May  1 11:50 [1;92m5a1579da6462101c92537155f3f7ad924ff7b0[0;39m  
+-r--r--r-- 1 igi igi 1427 Apr 19 17:40 [1;92m91a392a7bd6e5eae60cb9ea88b77d221b70bfb[0;39m  
+
+./.git/objects/cb:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   86 Apr 19 17:40 [1;92mf5579536c14fcae804ba765cafd321e536a7cb[0;39m  
+
+./.git/objects/cd:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  227 Apr 24 22:53 [1;92m3f520906f628ca11bbef9a951ba78e97a93a49[0;39m  
+
+./.git/objects/d0:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 22:27 [1;92meddb1473f0d3b964b00ba3105ecdc959516fe2[0;39m  
+
+./.git/objects/d3:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  212 Apr 19 17:40 [1;92m1c664eb79a2e24c083c46dbecaa7b3dd97ff09[0;39m  
+-r--r--r-- 1 igi igi  162 May  1 21:56 [1;92me3d2fed56834d0e116ce6c75567d2e38e1d44f[0;39m  
+
+./.git/objects/d4:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  898 Apr 19 17:40 [1;92mc67d99d43911b1575d6c45dadb98cfe5ba2969[0;39m  
+
+./.git/objects/d5:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  956 Apr 28 19:00 [1;92mc2cb02562d2d4c62dc8154b7c5fb3cfb8ecfac[0;39m  
+-r--r--r-- 1 igi igi  466 Apr 19 17:40 [1;92mcc5111196040374d1387f6cf8f8d9188bdab59[0;39m  
+
+./.git/objects/d6:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m7239f0eb0150d2ddbb2464cca347f857e8d301[0;39m  
+
+./.git/objects/d8:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  438 Apr 24 20:33 [1;92md6e6f39481ca35ef0d7de98756ae5b70ff20ab[0;39m  
+
+./.git/objects/da:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  111 Apr 19 17:40 [1;92mb7524cb6f8ce4d6ff0a5d623df95bcc7383c45[0;39m  
+-r--r--r-- 1 igi igi  127 Apr 24 13:27 [1;92mf9012be911b5d6ee5ef85d1477ff879af1d509[0;39m  
+
+./.git/objects/db:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  166 Apr 19 17:40 [1;92m0b46ade729498aa0999ede323e22e861f2e10a[0;39m  
+
+./.git/objects/dc:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  400 Apr 19 17:40 [1;92m0430af88964ff1b9cdec5cbff7553087061c15[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m446592da0981139fae201f1a56af3b0eeafd06[0;39m  
+
+./.git/objects/dd:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  208 Apr 30 19:03 [1;92mdbf7b3eede7434d494db10bcaaaf6f92af4473[0;39m  
+
+./.git/objects/de:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 19 17:40 [1;92m9a50495bf9471b8a3a3cdbcd3f26befc328c42[0;39m  
+
+./.git/objects/df:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 2141 Apr 19 17:40 [1;92m49ac8a017a5a4af15bd5c6bc0a6327b7e76810[0;39m  
+-r--r--r-- 1 igi igi  242 Apr 30 19:03 [1;92mb4a5fd723069a2dc3bdd65059fbcce673cb52d[0;39m  
+
+./.git/objects/e1:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  163 Apr 19 17:40 [1;92m37604ebbda1b33610612e65ab27e48d5dfd53f[0;39m  
+
+./.git/objects/e5:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  117 Apr 19 17:40 [1;92ma16ffacf89a1e7c6ac1e2fa99a8f4275dee87b[0;39m  
+-r--r--r-- 1 igi igi  190 Apr 19 17:40 [1;92mc9297b2f05001687219ce66c41b1fecffb9d12[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92mdef10a1dbc81de786c5e0658e026f6e9dba935[0;39m  
+
+./.git/objects/e6:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  211 Apr 24 13:27 [1;92m75cf0f480dfc266c2c5f4cea06b389f1707f6a[0;39m  
+-r--r--r-- 1 igi igi   15 Apr 19 17:40 [1;92m9de29bb2d1d6434b8b29ae775ad8c2e48c5391[0;39m  
+-r--r--r-- 1 igi igi  210 Apr 30 19:03 [1;92mff7b66e47e1f2bcf35f07aba0a025683eb0b74[0;39m  
+
+./.git/objects/e7:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  163 Apr 24 20:37 [1;92md84718156ec0d5d13fa48dc94d58a7de84baac[0;39m  
+
+./.git/objects/e9:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi 1111 Apr 30 19:03 [1;92m2acaf92c730e4667a90262171aa3376404dde5[0;39m  
+-r--r--r-- 1 igi igi  347 Apr 24 20:33 [1;92m371d622c10a63322bab08e87744b30e3f6823f[0;39m  
+
+./.git/objects/ea:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  189 Apr 30 19:03 [1;92m410b4ed7fbe934eef71cb85d7273ebb427a425[0;39m  
+
+./.git/objects/ef:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  187 Apr 19 17:40 [1;92mc3676f2a2497101795674fc3124554de7e4acf[0;39m  
+
+./.git/objects/f0:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  177 Apr 28 19:00 [1;92m1f64dc65b9fc55462ff7d8a003fafa91e0b34f[0;39m  
+-r--r--r-- 1 igi igi  182 Apr 19 17:40 [1;92m6f71e48a54d543dfa4281bdca1a8ddc226adbf[0;39m  
+
+./.git/objects/f2:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  281 Apr 19 17:40 [1;92m0935aa3e6955217fa59f59493b694bd060a6a5[0;39m  
+-r--r--r-- 1 igi igi  155 Apr 19 17:40 [1;92m2a8f7dd7bb6741b9bd15cbc76a3b294b5285e5[0;39m  
+
+./.git/objects/f3:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m5c62187c71b0c13e440ca76e641fb608daf12e[0;39m  
+
+./.git/objects/f6:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 24 13:27 [1;92m76b03622cd34f668c26f650e39984f99227eef[0;39m  
+-r--r--r-- 1 igi igi  333 Apr 19 17:40 [1;92m9a5d4612d746cff0a3d5a72bf52a423915ef08[0;39m  
+-r--r--r-- 1 igi igi  220 Apr 24 13:27 [1;92mcd2fe8a6a23870ede1522ea197b22a44f686a3[0;39m  
+
+./.git/objects/f7:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  110 Apr 19 17:40 [1;92m3c53a623234969291e2345bc9b49e5209cd5fc[0;39m  
+
+./.git/objects/fb:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  289 Apr 19 17:40 [1;92m7ff38ca3fbcefcf319646d8a4eb9098784711e[0;39m  
+
+./.git/objects/fc:
+total 16
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi   76 Apr 19 17:40 [1;92mae082e41c166e46e8f856ed858a454c94d91d9[0;39m  
+-r--r--r-- 1 igi igi 1225 Apr 30 19:03 [1;92mdd8fb6ec9974aded88177c88136dc3d2b4936e[0;39m  
+
+./.git/objects/fd:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  162 Apr 30 19:03 [1;92mf7e6013c13076881fa5d36d231d5516a080209[0;39m  
+
+./.git/objects/fe:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-r--r--r-- 1 igi igi  340 May  1 11:50 [1;92m36dcff2ebed034a9c7bae677698a0ebd633ce3[0;39m  
+
+./.git/objects/info:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/objects/pack:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/refs:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 3 igi igi 4096 May  1 22:27 [1;34mheads[0;39m  
+drwxrwxr-x 3 igi igi 4096 Apr 19 17:40 [1;34mremotes[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 19 17:41 [1;34mtags[0;39m  
+
+./.git/refs/heads:
+total 20
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi   41 May  1 22:27 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi   41 Apr 24 13:28 [1;92mmaster[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:44 [1;34morigin[0;39m  
+
+./.git/refs/heads/origin:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/refs/remotes:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 3 igi igi 4096 May  1 22:44 [1;34morigin[0;39m  
+
+./.git/refs/remotes/origin:
+total 24
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi   32 Apr 19 17:40 [1;92mHEAD[0;39m  
+-rw-rw-r-- 1 igi igi   41 May  1 22:28 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi   41 Apr 28 19:01 [1;92mmaster[0;39m  
+drwxrwxr-x 2 igi igi 4096 Apr 24 20:46 [1;34morigin[0;39m  
+
+./.git/refs/remotes/origin/origin:
+total 8
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+
+./.git/refs/tags:
+total 12
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi   41 Apr 19 17:41 [1;92mhw0[0;39m  
+
+./src:
+total 40
+drwxrwxr-x 6 igi igi  4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi  4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi 10212 May  1 23:52 [1;92mls.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   657 May  1 17:34 [1;92mls.h[0;39m  
+-rw-rw-r-- 1 igi igi   589 Apr 24 17:17 [1;92mmain.cpp[0;39m  
+-rw-rw-r-- 1 igi igi  6620 Apr 26 20:30 [1;92mrshell.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   347 Apr 19 17:40 [1;92mrshell.h[0;39m  
+
+./tests:
+total 80
+drwxrwxr-x 6 igi igi  4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi  4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+-rw-rw-r-- 1 igi igi  6151 Apr 19 17:40 [1;92mexec.script[0;39m  
+-rw-rw-r-- 1 igi igi 61440 May  1 23:54 [1;92mls.script[0;39m  
+-rw-rw-r-- 1 igi igi   393 Apr 19 17:40 [1;92mtest.script[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # end of huge output
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # handling of an[K[Kdirect[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[K[Kinput ultipl[K[K[K[K[K[Kmultiple files
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ ls[K[Kbil[Kn/ls LICENSE bin
+bin:
+[1;92mls[0;39m  [1;92mls.d[0;39m  [1;92mls.o[0;39m  
+
+LICENSE:
+[1;92mLICENSE[0;39m  ]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls LICENSE[K[K[K[K[K[K[Kbini[K src
+bin:
+[1;92mls[0;39m  [1;92mls.d[0;39m  [1;92mls.o[0;39m  
+
+src:
+[1;92mls.cpp[0;39m  [1;92mls.h[0;39m  [1;92mmain.cpp[0;39m  [1;92mrshell.cpp[0;39m  [1;92mrshell.h[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls src bin
+bin:
+[1;92mls[0;39m  [1;92mls.d[0;39m  [1;92mls.o[0;39m  
+
+src:
+[1;92mls.cpp[0;39m  [1;92mls.h[0;39m  [1;92mmain.cpp[0;39m  [1;92mrshell.cpp[0;39m  [1;92mrshell.h[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # s[Kdirs are sorted
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls ..
+[1;34mrshell[0;39m  [1;34mtest[0;39m  [1;34mvim-cpp-enhanced-highlight[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls ../../[K
+stat: No such file or directory
+
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # does not work at home directory
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # separate flags 
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -a -l
+total 40
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+drwxrwxr-x 8 igi igi 4096 May  1 22:27 [1;34m[47m.git[0;39m  
+-rw-rw-r-- 1 igi igi  271 Apr 19 17:40 [1;92m[47m.gitignore[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls l[K-l -a
+total 40
+drwxrwxr-x 6 igi igi 4096 May  1 21:52 [1;34m[47m.[0;39m  
+drwxrwxr-x 5 igi igi 4096 Apr 27 11:36 [1;34m[47m..[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+drwxrwxr-x 8 igi igi 4096 May  1 22:27 [1;34m[47m.git[0;39m  
+-rw-rw-r-- 1 igi igi  271 Apr 19 17:40 [1;92m[47m.gitignore[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -r[KR -l
+.:
+total 24
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+
+./bin:
+total 340
+-rwxrwxr-x 1 igi igi 106846 May  1 23:52 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi     30 May  1 23:52 [1;92mls.d[0;39m  
+-rw-rw-r-- 1 igi igi 231560 May  1 23:52 [1;92mls.o[0;39m  
+
+./src:
+total 32
+-rw-rw-r-- 1 igi igi 10212 May  1 23:52 [1;92mls.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   657 May  1 17:34 [1;92mls.h[0;39m  
+-rw-rw-r-- 1 igi igi   589 Apr 24 17:17 [1;92mmain.cpp[0;39m  
+-rw-rw-r-- 1 igi igi  6620 Apr 26 20:30 [1;92mrshell.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   347 Apr 19 17:40 [1;92mrshell.h[0;39m  
+
+./tests:
+total 76
+-rw-rw-r-- 1 igi igi  6151 Apr 19 17:40 [1;92mexec.script[0;39m  
+-rw-rw-r-- 1 igi igi 65536 May  1 23:55 [1;92mls.script[0;39m  
+-rw-rw-r-- 1 igi igi   393 Apr 19 17:40 [1;92mtest.script[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ binls[K[Kl[K/ls -l -R
+.:
+total 24
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34mbin[0;39m  
+-rw-rw-r-- 1 igi igi 1078 Apr 19 17:40 [1;92mLICENSE[0;39m  
+-rw-rw-r-- 1 igi igi  639 Apr 24 20:33 [1;92mmakefile[0;39m  
+-rw-rw-r-- 1 igi igi 1291 Apr 19 17:40 [1;92mREADME.md[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:52 [1;34msrc[0;39m  
+drwxrwxr-x 2 igi igi 4096 May  1 23:53 [1;34mtests[0;39m  
+
+./bin:
+total 340
+-rwxrwxr-x 1 igi igi 106846 May  1 23:52 [1;92mls[0;39m  
+-rw-rw-r-- 1 igi igi     30 May  1 23:52 [1;92mls.d[0;39m  
+-rw-rw-r-- 1 igi igi 231560 May  1 23:52 [1;92mls.o[0;39m  
+
+./src:
+total 32
+-rw-rw-r-- 1 igi igi 10212 May  1 23:52 [1;92mls.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   657 May  1 17:34 [1;92mls.h[0;39m  
+-rw-rw-r-- 1 igi igi   589 Apr 24 17:17 [1;92mmain.cpp[0;39m  
+-rw-rw-r-- 1 igi igi  6620 Apr 26 20:30 [1;92mrshell.cpp[0;39m  
+-rw-rw-r-- 1 igi igi   347 Apr 19 17:40 [1;92mrshell.h[0;39m  
+
+./tests:
+total 76
+-rw-rw-r-- 1 igi igi  6151 Apr 19 17:40 [1;92mexec.script[0;39m  
+-rw-rw-r-- 1 igi igi 65536 May  1 23:55 [1;92mls.script[0;39m  
+-rw-rw-r-- 1 igi igi   393 Apr 19 17:40 [1;92mtest.script[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # inclu[Korr[K[K[K[Korrect flags
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -Z
+Invalid option: 'Z'
+Supported flags: -a, -R, -l
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -z
+Invalid option: 'z'
+Supported flags: -a, -R, -l
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/ls -b
+Invalid option: 'b'
+Supported flags: -a, -R, -l
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ # handling of [K[K[K[K[K[K[K[K[K[K[K[K[K[K# same direto[K[Kctory repeated
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ binl[K/ls . . .
+.:
+[1;34mbin[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+
+.:
+[1;34mbin[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+
+.:
+[1;34mbin[0;39m  [1;92mLICENSE[0;39m  [1;92mmakefile[0;39m  [1;92mREADME.md[0;39m  [1;34msrc[0;39m  [1;34mtests[0;39m  
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ ls . . .
+.:
+[0m[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+
+.:
+[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+
+.:
+[01;34mbin[0m  LICENSE  makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ end[K[Kxit
+exit
+
+Script done on Fri 01 May 2015 11:56:30 PM PDT

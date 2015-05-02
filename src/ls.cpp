@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/ioctl.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -19,6 +20,8 @@
 #include <algorithm>
 #include <map>
 #include <utility>
+#include <string>
+#include <sstream>
 
 #include "ls.h"
 
@@ -182,7 +185,9 @@ int printinfo(std::vector<std::string> paths) {
     nlink_t max_nlink = 0;
     off_t max_size = 0;
     blkcnt_t total_blocks = 0;
-   
+    unsigned int max_filename_length = 0;
+    unsigned int total_width = 0;
+
     // first iteration - collect info, construct map
     for(auto p : paths) {
 
@@ -197,6 +202,9 @@ int printinfo(std::vector<std::string> paths) {
         std::string filename(p);
         filename = filename.substr(filename.find_last_of("/\\") + 1);
 
+        if(filename.length() > max_filename_length)
+            max_filename_length = filename.length();
+
         if(LS_MODE & LS_MODE_SHOWALL || filename[0] != '.')
             total_blocks += stat_buf.st_blocks;
 
@@ -208,6 +216,8 @@ int printinfo(std::vector<std::string> paths) {
     if(LS_MODE & LS_MODE_LIST)
         std::cout << "total " << total_blocks/2 << std::endl;
 
+    std::stringstream ssout;
+    std::vector<std::string> out_set;
 
     for(auto &fs : filestats) {
 
@@ -289,28 +299,47 @@ int printinfo(std::vector<std::string> paths) {
 
                 std::cout << " ";
             }
+
     
             // filetype coloring
             switch(typechar) {
                 case '-':
-                std::cout << LS_COL_FILE;
+                ssout << LS_COL_FILE;
                 break;
 
                 case 'd':
-                std::cout << LS_COL_DIR;
+                ssout << LS_COL_DIR;
                 break;
 
                 default:
                 break;
             }
 
-            if(filename[0] == '.') std::cout << LS_COL_HIDDEN;
+            if(filename[0] == '.') ssout << LS_COL_HIDDEN;
 
-            std::cout << filename << LS_COL_DEFAULT << "  ";
+            ssout << filename << LS_COL_DEFAULT << "  ";
+            total_width += filename.length();
  
             if(LS_MODE & LS_MODE_LIST)
-                std::cout << std::endl;
+                std::cout << ssout.str() << std::endl;
+            else
+                out_set.push_back(ssout.str());
+
+            ssout.str(std::string());
         }
+    }
+
+    if(!(LS_MODE & LS_MODE_LIST)) {
+/*
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+        unsigned int width = w.ws_col;
+        if(total_width > width) {
+            std::cout << "DEBUG" << total_width << " " << width << std::endl;
+            unsigned int num_col = total_width / width;
+        } else */
+            for(auto s : out_set) 
+                std::cout << s;
     }
 
     return 0;
@@ -349,6 +378,6 @@ int scandir(const char* path, std::vector<std::string> &files) {
         perror("closedir");
         return -1;
     }
-    
+
     return 0;
 }
