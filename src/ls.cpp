@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
+#include <time.h>
 
 #include <iostream>
 #include <vector>
@@ -71,6 +72,7 @@ int main(int argc, char** argv) {
         }
 
 
+    // begin program on requested files
     if(cmdfiles.empty())
         readloc(".");
     else for(auto path : cmdfiles)
@@ -182,6 +184,7 @@ int printinfo(std::vector<std::string> paths) {
     std::map<std::string, struct stat, classnamecmp> filestats;
 
     nlink_t max_nlink = 0;
+    off_t max_size = 0;
    
     // first iteration - collect info, construct map
     for(auto p : paths) {
@@ -189,8 +192,11 @@ int printinfo(std::vector<std::string> paths) {
         struct stat stat_buf;
         if(stat(p.c_str(), &stat_buf) == -1) { perror("stat"); return -1; }
 
+        // find maximum values of numeric fields (for column formatting)
         if(stat_buf.st_nlink > max_nlink) max_nlink = stat_buf.st_nlink;
+        if(stat_buf.st_size > max_size) max_size = stat_buf.st_size;
 
+        // extract filename from full path
         std::string filename(p);
         filename = filename.substr(filename.find_last_of("/\\") + 1);
 
@@ -235,10 +241,21 @@ int printinfo(std::vector<std::string> paths) {
                 std::cout << typechar << rights << " ";
     
                 nlink_t nlink = filestat.st_nlink;
-                for(unsigned int i = 0; i < (max_nlink/10) - (nlink/10); i++)
+                for(unsigned int i = 0; i < std::to_string(max_nlink).length() - std::to_string(nlink).length(); i++)
                     std::cout << " ";
-
                 std::cout << nlink << " ";
+
+                std::cout << "-user- -user- ";
+
+                off_t size = filestat.st_size;
+                for(unsigned int i = 0; i < std::to_string(max_size).length() - std::to_string(size).length(); i++)
+                    std::cout << " ";
+                std::cout << size << " ";
+
+                char* time_str = ctime(&filestat.st_mtime);
+                for(int i = 4; i < 16; i++)
+                    std::cout << time_str[i];
+                std::cout << " ";
             }
     
             // filetype coloring
@@ -257,7 +274,7 @@ int printinfo(std::vector<std::string> paths) {
 
             if(filename[0] == '.') std::cout << LS_COL_HIDDEN;
 
-           std::cout << filename << LS_COL_DEFAULT << "  ";
+            std::cout << filename << LS_COL_DEFAULT << "  ";
  
             if(LS_MODE & LS_MODE_LIST)
                 std::cout << std::endl;

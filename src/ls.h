@@ -12,7 +12,7 @@ enum LS_MODEFLAGS {
 const char* LS_COL_DEFAULT =    "\033[0;39m";
 const char* LS_COL_FILE =       "\033[1;92m";
 const char* LS_COL_DIR =        "\033[1;34m";
-const char* LS_COL_HIDDEN =     "\033[40m";
+const char* LS_COL_HIDDEN =     "\033[47m";
 
 extern int LS_MODE;
 
