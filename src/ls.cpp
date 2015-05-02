@@ -11,6 +11,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <time.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include <iostream>
 #include <vector>
@@ -109,6 +111,11 @@ void readloc(const char* path) {
     else
         LS_MODE &= ~LS_MODE_FIRSTENTRY;
 
+    // output nice directory title 
+    if(     LS_MODE & LS_MODE_MANYFILES ||
+            LS_MODE & LS_MODE_RECURSIVE     ) 
+        std::cout << path << ":" << std::endl;
+
 
     // get and sort files within directory
     std::vector<std::string> files;
@@ -125,16 +132,6 @@ void readloc(const char* path) {
     // create container of same type for dirs
     decltype(files) dirs;
 
-    // output nice directory title 
-    if(     LS_MODE & LS_MODE_MANYFILES ||
-            LS_MODE & LS_MODE_RECURSIVE     ) 
-        std::cout << path << ":" << std::endl;
-
-    // if listing, output used block total
-    if(LS_MODE & LS_MODE_LIST)
-        std::cout << "total x" << std::endl;
-
-
     // first iteration through filename list
     for(auto &&f : files) {
         
@@ -143,7 +140,7 @@ void readloc(const char* path) {
         //stat the file
         struct stat stat_buf;
         if(stat(fullpath.c_str(), &stat_buf) == -1) { perror("stat"); exit(1); }
-       
+        
         // skip hidden files if not in showall mode
         if(f == "." || f == ".." || (!(LS_MODE & LS_MODE_SHOWALL) && f[0] == '.'))
             continue; 
@@ -156,7 +153,6 @@ void readloc(const char* path) {
         // replace with full path for printing
         f = fullpath;
     }
-
 
     // send set of filepaths to print
     printinfo(files);
@@ -185,6 +181,7 @@ int printinfo(std::vector<std::string> paths) {
 
     nlink_t max_nlink = 0;
     off_t max_size = 0;
+    blkcnt_t total_blocks = 0;
    
     // first iteration - collect info, construct map
     for(auto p : paths) {
@@ -195,13 +192,21 @@ int printinfo(std::vector<std::string> paths) {
         // find maximum values of numeric fields (for column formatting)
         if(stat_buf.st_nlink > max_nlink) max_nlink = stat_buf.st_nlink;
         if(stat_buf.st_size > max_size) max_size = stat_buf.st_size;
-
+        
         // extract filename from full path
         std::string filename(p);
         filename = filename.substr(filename.find_last_of("/\\") + 1);
 
+        if(LS_MODE & LS_MODE_SHOWALL || filename[0] != '.')
+            total_blocks += stat_buf.st_blocks;
+
         filestats.insert(std::make_pair(filename, stat_buf));
     }
+
+
+    // if listing, output used block total (1024 to 512 byte)
+    if(LS_MODE & LS_MODE_LIST)
+        std::cout << "total " << total_blocks/2 << std::endl;
 
 
     for(auto &fs : filestats) {
@@ -239,19 +244,36 @@ int printinfo(std::vector<std::string> paths) {
                     rights[8-i] = (mask & (1 << i)) ? rights[8-i] : '-';
 
                 std::cout << typechar << rights << " ";
-    
+   
+                // print link number
                 nlink_t nlink = filestat.st_nlink;
                 for(unsigned int i = 0; i < std::to_string(max_nlink).length() - std::to_string(nlink).length(); i++)
                     std::cout << " ";
                 std::cout << nlink << " ";
 
-                std::cout << "-user- -user- ";
+                // print owner and group 
+                uid_t uid = filestat.st_uid;
+                gid_t gid = filestat.st_gid;
 
+                struct passwd* pwd;
+                errno = 0;
+                pwd = getpwuid(uid);
+                if(errno != 0) perror("getpwuid"); 
+
+                struct group* grp;
+                errno = 0;
+                grp = getgrgid(gid);
+                if(errno != 0) perror("getpwuid");
+
+                std::cout << pwd->pw_name << " " << grp->gr_name << " ";
+
+                // print size of file
                 off_t size = filestat.st_size;
                 for(unsigned int i = 0; i < std::to_string(max_size).length() - std::to_string(size).length(); i++)
                     std::cout << " ";
                 std::cout << size << " ";
 
+                // print time last modified
                 char* time_str = ctime(&filestat.st_mtime);
                 for(int i = 4; i < 16; i++)
                     std::cout << time_str[i];
@@ -317,6 +339,6 @@ int scandir(const char* path, std::vector<std::string> &files) {
         perror("closedir");
         return -1;
     }
-
+    
     return 0;
 }
