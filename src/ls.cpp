@@ -274,9 +274,19 @@ int printinfo(std::vector<std::string> paths) {
                 std::cout << size << " ";
 
                 // print time last modified
-                char* time_str = ctime(&filestat.st_mtime);
-                for(int i = 4; i < 16; i++)
-                    std::cout << time_str[i];
+                // if modified before current year print year instead of time
+                time_t* mtime = &filestat.st_mtime;
+                time_t curtime = time(NULL);
+                char* time_str = ctime(mtime);
+                if(localtime(mtime)->tm_year == localtime(&curtime)->tm_year)
+                    for(int i = 4; i < 16; i++)
+                        std::cout << time_str[i];
+                else {
+                    for(int i = 4; i < 11; i++)
+                        std::cout << time_str[i];
+                    std::cout << " " << localtime(mtime)->tm_year + 1900;
+                }
+
                 std::cout << " ";
             }
     
