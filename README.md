@@ -13,11 +13,21 @@ To run, invoke ```bin/rshell``` in bash.
 
 ### notes
 
-All basic programs in ```/bin``` are supported. (This means cd does not work, yet.)
+#### connectors
+
+All basic programs in your ```/bin``` can be invoked. (This means cd does not work, yet.)
 
 The bash connectors ```&&```, ```||```, ```;``` are suported and function exactly the same.
 
 Connectors at the beginning of a line are treated as syntax errors.
+
+#### piping
+
+rshell supports basic piping, as in bash.  the format ```cmd | cmd```, ```cmd < file```, ```cmd > file```, and ```cmd >> file``` are supported, as well as chaining.
+
+Whitespace is ignored for pipes. They are not affected by connectors. 
+
+#### other
 
 When ```ls``` is invoked, the flag ```--color``` is appended to enable colors.
 
@@ -27,7 +37,8 @@ If you want to modify the source code to better understand the logic, defining t
 
 
 This program mostly just invokes stuff in /bin, so it inherits all functionality from them.
-More advanced bash commands aren't guaranteed to work at all - in fact, they may crash rshell outright.
+Some standard programs partially implemented include ```mv```, ```cp```, ```rm```, and ```ls```.
+More advanced bash commands not seen here aren't guaranteed to work at all - in fact, they may crash rshell outright.
 
 Connector syntax and logic was thoroughly tested and all known bugs mended - if you happen to find any wrong behavior, please submit a comment or email me at 'ichor001@ucr.edu'.
 

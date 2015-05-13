@@ -1,6 +1,7 @@
 // RSHELL.CPP
 // Main source code for rshell
 
+// enable debug messages
 //#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
@@ -27,7 +28,11 @@
 const char* CONN_AMP = "&&";
 const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
-const char* TOK_COMMENT = "#";
+const char* TOKN_COMMENT = "#";
+
+const char* RDIR_PIPE = "|";
+const char* RDIR_INPUT = "<";
+const char* RDIR_OUTPUT = ">";
  
 
 /* Initialize environment */
@@ -38,6 +43,7 @@ void init() {}
 int run() {
    
     std::vector<std::string> tokens_spc;
+    std::vector<std::string> tokens_pipe;
     std::vector<std::string> tokens_word;
     std::string usr_input;
     int prev_exit_code = 0;
@@ -85,44 +91,76 @@ int run() {
                     skip_cmd = false;
                     continue;
                 }
-            } else if(  spc == std::string(TOK_COMMENT)) {
+            } else if(  spc == std::string(TOKN_COMMENT)) {
                 break;
             }
 
             if(skip_cmd) continue;
 
-            tokens_word = toksplit(spc, " ");
-            for(unsigned int j = 0; j < tokens_word.size(); j++) {
-                
-                std::string word = tokens_word.at(j);
-                // kill empty words
-                if(word == "") tokens_word.erase(tokens_word.begin() + j);
+            tokens_pipe = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
+            unsigned int pipe_i = 0;
+            int syntax_err = 0;
+            for(; pipe_i < tokens_pipe.size(); pipe_i++) {
 
-                // using boost for convenience - this can be implemented manually
-                boost::trim_if(word, boost::is_any_of(" \t"));
-            }
-           
-            // if ls is invoked, print apology 
-            if(tokens_word.at(0) == "ls") {
-                std::cout << "sorry, not implemented yet...\n";
-                continue;
-            }
-            
-            std::vector<char*> cmd_argv(tokens_word.size() + 1);
-            for(unsigned int k = 0; k < tokens_word.size(); k++) { 
-               cmd_argv[k] = &tokens_word[k][0]; 
+                std::string cmd = tokens_pipe.at(pipe_i);
+
+                if(cmd == "") tokens_pipe.erase(tokens_pipe.begin() + pipe_i);
+                boost::trim_if(cmd, boost::is_any_of(" \t"));
+
+                if(cmd == RDIR_PIPE) {
+                    if(pipe_i == 0) {
+                        syntax_err = 1;
+                        std::cout << "syntax error: token \"|\" at start of command\n";
+                        break;
+                    }
+                    continue;
+                }
+                if(cmd == RDIR_INPUT) {
+                     if(pipe_i == tokens_pipe.size() - 1) {
+                        syntax_err = 1;
+                        std::cout << "syntax error: expected file for input \"<\"\n";
+                        break;
+                    }
+                    continue;
+                }
+                if(cmd == RDIR_OUTPUT) {
+                    if(pipe_i == tokens_pipe.size() - 1) {
+                        syntax_err = 1;
+                        std::cout << "syntax error: expected file for output \">\"\n";
+                        break;
+                    }
+                    continue;
+                }
+
+                tokens_word = toksplit(cmd, " ");
+                for(unsigned int j = 0; j < tokens_word.size(); j++) {
+
+                    std::string word = tokens_word.at(j);
+                    // kill empty words
+                    if(word == "") tokens_word.erase(tokens_word.begin() + j);
+
+                    // using boost for convenience - this can be implemented manually
+                    boost::trim_if(word, boost::is_any_of(" \t"));
+                }
+
+                std::vector<char*> cmd_argv(tokens_word.size() + 1);
+                for(unsigned int k = 0; k < tokens_word.size(); k++) { 
+                    cmd_argv[k] = &tokens_word[k][0]; 
 #ifdef RSHELL_DEBUG 
-               std::cout << "\t" << "<" << tokens_word.at(k) << ">" << std::endl;
+                    std::cout << "\t" << "<" << tokens_word.at(k) << ">" << std::endl;
 #endif
-            }            
+                }            
 
-            // exit only if first word is "exit", after formatting
-            if(tokens_word.at(0) == "exit") return 0;
+                // exit only if first word is "exit", after formatting
+                if(tokens_word.at(0) == "exit") return 0;
 
-            prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
-    
-            // if execvp returned and had error, stop the process
-          //  if(err_num == 1) return 1;
+                prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
+
+                // if execvp returned and had error, stop the process
+                //  if(err_num == 1) return 1;
+            }
+
+            if(syntax_err == 1) break;
         }
     }
     
