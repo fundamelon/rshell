@@ -2,7 +2,7 @@
 // Main source code for rshell
 
 // enable debug messages
-#define RSHELL_DEBUG
+//#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
 
@@ -69,10 +69,11 @@ int run() {
         bool skip_cmd = false;
         std::string prev_spc = "";
         usr_input = prompt();
-
+ 
+        // regex '||', '&&', ';', or '#'
         tokens_spc = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
+
         for(unsigned int i = 0; i < tokens_spc.size(); i++) {
-//            std::cout << prev_exit_code << std::endl;
 
             std::string spc = tokens_spc.at(i);
 
@@ -110,7 +111,7 @@ int run() {
                 continue;
 
             } else if(  spc == std::string(CONN_SEMIC)) {
-                if(i == 0 || prev_spc != "")  {
+                if(i == 0)  {
                     std::cout << "syntax error: bad token \"" << CONN_SEMIC << "\"\n";
                     break;
                 } else {
