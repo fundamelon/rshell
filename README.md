@@ -26,6 +26,7 @@ Connectors at the beginning of a line are treated as syntax errors.
 rshell supports basic piping, as in bash.  the format ```cmd | cmd```, ```cmd < file```, ```cmd > file```, and ```cmd >> file``` are supported, as well as chaining.
 
 Whitespace is ignored for pipes. They are not affected by connectors. 
+However, note that syntax errors with pipes are only detected at *runtime*, and will abort execution from that point onward.
 
 #### other
 

@@ -2,7 +2,7 @@
 // Main source code for rshell
 
 // enable debug messages
-//#define RSHELL_DEBUG
+#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
 
@@ -30,9 +30,25 @@ const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
 const char* TOKN_COMMENT = "#";
 
-const char* RDIR_PIPE = "|";
-const char* RDIR_INPUT = "<";
-const char* RDIR_OUTPUT = ">";
+const char* RDIR_PIPE_SYM = "|";
+const char* RDIR_INPUT_SYM = "<";
+const char* RDIR_OUTPUT_SYM = ">";
+
+enum RDIR_TYPE {
+    RDIR_PIPE = 0x001,
+    RDIR_INPUT = 0x002,
+    RDIR_OUTPUT = 0x004,
+    RDIR_OUTPUT_APP = 0x008
+};
+
+
+struct pipe {
+    pipe(int t) : type(t) {}
+    pipe(int r, int l, int t) : type(t) { files[0] = r; files[1] = t; }
+    int type;
+    int pipefd[2] = { 0, 1 };
+    int files[2];
+};
  
 
 /* Initialize environment */
@@ -47,10 +63,11 @@ int run() {
     std::vector<std::string> tokens_word;
     std::string usr_input;
     int prev_exit_code = 0;
-    bool skip_cmd = false;
 
     while(true) {
         
+        bool skip_cmd = false;
+        std::string prev_spc = "";
         usr_input = prompt();
 
         tokens_spc = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
@@ -58,6 +75,8 @@ int run() {
 //            std::cout << prev_exit_code << std::endl;
 
             std::string spc = tokens_spc.at(i);
+
+            boost::trim(spc);
 
 #ifdef RSHELL_DEBUG
             std::cout << "<" << spc << ">" << std::endl;
@@ -67,80 +86,124 @@ int run() {
 
             // assumption: a connector token has no whitespace
             if(         spc == std::string(CONN_AMP)) {
-                if(prev_exit_code != 0  && i != 0) {
+                if(i == 0 || prev_spc != "") {  
+                    std::cout << "syntax error: bad token \"" << CONN_AMP << "\"\n";
+                    break;
+                } else if(prev_exit_code != 0  && i != 0) {
                     skip_cmd = true; 
                     continue;
-                } else if(i == 0) {  
-                    std::cout << "syntax error: unexpected token \"" << CONN_AMP << "\"\n";
-                    break;
-                } else continue;
+                }
+               
+                prev_spc = spc;
+                continue;
+
             } else if(  spc == std::string(CONN_PIPE)) {
-                if(prev_exit_code == 0 && i != 0) {
+                if(i == 0 || prev_spc != "") { 
+                    std::cout << "syntax error: bad token \"" << CONN_PIPE << "\"\n";
+                    break;
+                } else if(prev_exit_code == 0 && i != 0) {
                     skip_cmd = true;
                     continue;
-                } else if(i == 0) { 
-                    std::cout << "syntax error: unexpected token \"" << CONN_PIPE << "\"\n";
-                    break;
-                } else continue;
+                } 
+       
+                prev_spc = spc;
+                continue;
+
             } else if(  spc == std::string(CONN_SEMIC)) {
-                if(i == 0)  {
-                    std::cout << "syntax error: unexpected token \"" << CONN_SEMIC << "\"\n";
+                if(i == 0 || prev_spc != "")  {
+                    std::cout << "syntax error: bad token \"" << CONN_SEMIC << "\"\n";
                     break;
                 } else {
                     prev_exit_code = 0;
                     skip_cmd = false;
+                    prev_spc = spc;
                     continue;
                 }
             } else if(  spc == std::string(TOKN_COMMENT)) {
                 break;
             }
 
+            prev_spc = "";
             if(skip_cmd) continue;
 
             tokens_pipe = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
-            unsigned int pipe_i = 0;
             int syntax_err = 0;
-            for(; pipe_i < tokens_pipe.size(); pipe_i++) {
+
+            std::vector<std::string> cmd_set;
+            std::vector<struct pipe> pipe_set;
+
+            std::string cur_rdir = "";
+
+            // syntax pass
+            for(unsigned int pipe_i = 0; pipe_i < tokens_pipe.size(); pipe_i++) {
 
                 std::string cmd = tokens_pipe.at(pipe_i);
 
-                if(cmd == "") tokens_pipe.erase(tokens_pipe.begin() + pipe_i);
-                boost::trim_if(cmd, boost::is_any_of(" \t"));
+                if(cmd == "") { 
+                    tokens_pipe.erase(tokens_pipe.begin() + pipe_i);
+                    break;
+                }
+                boost::trim(cmd);
 
-                if(cmd == RDIR_PIPE) {
+                if(cmd == RDIR_PIPE_SYM) {
                     if(pipe_i == 0) {
                         syntax_err = 1;
                         std::cout << "syntax error: token \"|\" at start of command\n";
                         break;
+                    } else if(cur_rdir != "") {
+                        syntax_err = 1;
+                        std::cout << "syntax error: bad token near \"|\"\n";
+                        break;
                     }
+
+                    cur_rdir.append(RDIR_PIPE_SYM);
+                    
                     continue;
-                }
-                if(cmd == RDIR_INPUT) {
-                     if(pipe_i == tokens_pipe.size() - 1) {
+
+                } else if(cmd == RDIR_INPUT_SYM) {
+                    if(pipe_i == tokens_pipe.size() - 1) {
                         syntax_err = 1;
                         std::cout << "syntax error: expected file for input \"<\"\n";
                         break;
                     }
+
                     continue;
-                }
-                if(cmd == RDIR_OUTPUT) {
+
+                } else if(cmd == RDIR_OUTPUT_SYM) {
                     if(pipe_i == tokens_pipe.size() - 1) {
                         syntax_err = 1;
                         std::cout << "syntax error: expected file for output \">\"\n";
                         break;
                     }
-                    continue;
+
+                    // skip to next consecutive output redir symbol
+                    if(tokens_pipe.at(pipe_i + 1) == RDIR_OUTPUT_SYM) {
+                        pipe_i++;
+                        continue;
+                    } 
+
+                } else {
+                    cmd_set.push_back(cmd);
                 }
+            }
+
+            if(syntax_err == 1) break;
+
+            // command running pass
+            for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
+
+                auto cmd = cmd_set.at(cmd_i);
 
                 tokens_word = toksplit(cmd, " ");
                 for(unsigned int j = 0; j < tokens_word.size(); j++) {
 
                     std::string word = tokens_word.at(j);
-                    // kill empty words
-                    if(word == "") tokens_word.erase(tokens_word.begin() + j);
 
                     // using boost for convenience - this can be implemented manually
-                    boost::trim_if(word, boost::is_any_of(" \t"));
+                    boost::trim(word);
+
+                    // kill empty words
+                    if(word == "") tokens_word.erase(tokens_word.begin() + j);
                 }
 
                 std::vector<char*> cmd_argv(tokens_word.size() + 1);
@@ -159,8 +222,6 @@ int run() {
                 // if execvp returned and had error, stop the process
                 //  if(err_num == 1) return 1;
             }
-
-            if(syntax_err == 1) break;
         }
     }
     
@@ -260,7 +321,7 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
 
     for(unsigned int i = 0; i < token_vec.size(); i++) {
 #ifdef RSHELL_DEBUG
-        std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
+//        std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
 #endif
         if(token_vec.at(i) == "") token_vec.erase(token_vec.begin() + i);
     } 
