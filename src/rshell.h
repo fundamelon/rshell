@@ -11,7 +11,7 @@ struct redir {
     int type;
     int pipefd[2] = { 0, 1 };
     int pids[2];
-    const char* redir_file;
+    const char* file;
 };
 
 

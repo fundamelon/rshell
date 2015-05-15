@@ -240,7 +240,7 @@ int run() {
             }
 
 
-            // file descriptor forwarded from pipe
+            // file descriptor forwarded from pipe, default: std input
             int fd_fwd = 0;
 
             // command execution pass
@@ -276,7 +276,7 @@ int run() {
 
                 // execute command
                 if(single_cmd)
-                    execute(cmd_argv[0], cmd_argv.data());
+                    prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
                 else {
 
                     // piping logic
@@ -285,20 +285,17 @@ int run() {
 
                         if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_OUTPUT) {
                             const char* filepath = cmd_set.at(cmd_i + 2).c_str();
-                            int output_fd = open(filepath, O_CREAT);
-                            if(output_fd == -1) {
-                                perror("input redirect: open file");
-                                break;
-                            }
-
-                            fd_fwd = output_fd;
+                            redir.file = filepath;
+                            redir.type = redir_set.at(cmd_i + 1).type;
                             cmd_i += 2;
                         }
                     }
 
-                    execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
+                    prev_exit_code = execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
                 }
             }
+
+            if(prev_exit_code != 0) break;
 
             // wait for all child processes to end and save exit code
             int pid_child;
@@ -306,11 +303,14 @@ int run() {
                 if(pid_child == -1) break;
                 else {
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
-                        perror("error: waitpid on child processes");
+                        if(!prev_exit_code == errno) // prevent repetition of errmsgs
+                            perror("child process: waitpid");
                         break;
                     }
                 }
             }
+            
+            if(prev_exit_code != 0) break;
         }
     }
     
@@ -352,11 +352,14 @@ int execute(const char* path, char* const argv[]) {
 /* fork and exec a program, complete error checking */
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
 
-    _PRINT("executing " << path)
+    _PRINT("*** executing " << path)
 
     bool use_redir = (redir_info != NULL);
 
+    // initialize pipe
     if(use_redir) {
+        _PRINT("execute: using redirection")
+        _PRINT("forwarded fd: " << *fd_fwd)
         if(pipe(redir_info->pipefd) != 0) {
             perror("pipe");
             return errno;
@@ -365,12 +368,50 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
     
     int pid = fork();
 
-    _PRINT("created process with id " << pid)
+    if(pid != 0) _PRINT("created process with id " << pid)
 
     if(pid == -1) {
         perror("error: fork");
         return -1;
     } else if(pid == 0) {
+        // fd redirection
+        if(use_redir) {
+            if(redir_info->type == REDIR_TYPE_OUTPUT) {
+
+                // expects output file in redir_info->redir_file
+                _PRINT("redir: output to file " << redir_info->file)
+                int output_fd = open(redir_info->file, O_CREAT | O_WRONLY);
+                if(output_fd == -1) {
+                    perror("output redirect: open");
+                    exit(errno);
+                }
+
+                if(*fd_fwd != 0) {
+                    if(close(0) == -1) {
+                        perror("input redirect: close");
+                        exit(errno);
+                    }
+
+                    // input from forwarded fd
+                    if(dup(*fd_fwd) == -1) {
+                        perror("input redirect: dup");
+                        exit(errno);
+                    }
+                }
+
+                if(close(1) == -1) {
+                    perror("output redirect: close");
+                    exit(errno);
+                }
+
+                // output to redir file
+                if(dup(output_fd) == -1) {
+                    perror("output redirect: dup");
+                    exit(errno);
+                }
+            }
+        }
+
         execvp(path, argv);
         perror(path);
         exit(1);

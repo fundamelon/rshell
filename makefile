@@ -1,5 +1,5 @@
 
-CXX = g++ -MMD
+CXX = g++ -MMD -g
 CXXFLAGS = --std=c++11 -Wall -Werror -pedantic 
 BOOSTFLAGS = -lboost_regex
 
