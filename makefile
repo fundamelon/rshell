@@ -1,5 +1,5 @@
 
-CXX = g++
+CXX = g++ -MMD
 CXXFLAGS = --std=c++11 -Wall -Werror -pedantic 
 BOOSTFLAGS = -lboost_regex
 
@@ -46,3 +46,8 @@ $(ODIR)%.o: $(SDIR)%.cpp
 clean: 
 	rm -f *.o *.d rshell *~
 	rm -rf $(ODIR)
+
+.PHONY: test
+test:
+	make rshell
+	bin/rshell

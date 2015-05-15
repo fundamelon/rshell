@@ -30,24 +30,26 @@ const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
 const char* TOKN_COMMENT = "#";
 
-const char* RDIR_PIPE_SYM = "|";
-const char* RDIR_INPUT_SYM = "<";
-const char* RDIR_OUTPUT_SYM = ">";
+const char* REDIR_SYM_PIPE = "|";
+const char* REDIR_SYM_INPUT = "<";
+const char* REDIR_SYM_OUTPUT = ">";
 
-enum RDIR_TYPE {
-    RDIR_PIPE = 0x001,
-    RDIR_INPUT = 0x002,
-    RDIR_OUTPUT = 0x004,
-    RDIR_OUTPUT_APP = 0x008
+enum REDIR_TYPE {
+    REDIR_TYPE_CMD        = 0x001,
+    REDIR_TYPE_PIPE       = 0x002,
+    REDIR_TYPE_INPUT      = 0x004,
+    REDIR_TYPE_OUTPUT     = 0x008,
+    REDIR_TYPE_OUTPUT_APP = 0x010
 };
 
 
-struct pipe {
-    pipe(int t) : type(t) {}
-    pipe(int r, int l, int t) : type(t) { files[0] = r; files[1] = t; }
+struct redir {
+    redir(int t) : type(t) {}
+    redir(int r, int l, int t) : type(t) { pids[0] = r; pids[1] = l; }
     int type;
     int pipefd[2] = { 0, 1 };
-    int files[2];
+    int pids[2];
+    const char* redir_file;
 };
  
 
@@ -59,7 +61,7 @@ void init() {}
 int run() {
    
     std::vector<std::string> tokens_spc;
-    std::vector<std::string> tokens_pipe;
+    std::vector<std::string> tokens_redir;
     std::vector<std::string> tokens_word;
     std::string usr_input;
     int prev_exit_code = 0;
@@ -127,63 +129,68 @@ int run() {
             prev_spc = "";
             if(skip_cmd) continue;
 
-            tokens_pipe = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
+            tokens_redir = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
             int syntax_err = 0;
 
             std::vector<std::string> cmd_set;
-            std::vector<struct pipe> pipe_set;
-
-            std::string cur_rdir = "";
+            std::vector<struct redir> redir_set;
 
             // syntax pass
-            for(unsigned int pipe_i = 0; pipe_i < tokens_pipe.size(); pipe_i++) {
+            for(unsigned int redir_i = 0; redir_i < tokens_redir.size(); redir_i++) {
 
-                std::string cmd = tokens_pipe.at(pipe_i);
+                std::string cmd = tokens_redir.at(redir_i);
 
                 if(cmd == "") { 
-                    tokens_pipe.erase(tokens_pipe.begin() + pipe_i);
+                    tokens_redir.erase(tokens_redir.begin() + redir_i);
+                    std::cout << "syntax error: unexpected null command\n";
                     break;
                 }
                 boost::trim(cmd);
+                std::cout << "<" << cmd << ">\n";
 
-                if(cmd == RDIR_PIPE_SYM) {
-                    if(pipe_i == 0) {
+                if(cmd == REDIR_SYM_PIPE) { // '|' piping operator
+                    if(redir_i == 0) {
                         syntax_err = 1;
                         std::cout << "syntax error: token \"|\" at start of command\n";
                         break;
-                    } else if(cur_rdir != "") {
+                    } else if(redir_set.back().type != REDIR_TYPE_CMD) {
                         syntax_err = 1;
                         std::cout << "syntax error: bad token near \"|\"\n";
                         break;
                     }
 
-                    cur_rdir.append(RDIR_PIPE_SYM);
-                    
-                    continue;
+                    redir_set.push_back(redir(REDIR_TYPE_PIPE));
+                    continue; // default action
 
-                } else if(cmd == RDIR_INPUT_SYM) {
-                    if(pipe_i == tokens_pipe.size() - 1) {
+                } else if(cmd == REDIR_SYM_INPUT) { // '<' input redirection operator
+                    if(redir_i == tokens_redir.size() - 1) {
                         syntax_err = 1;
                         std::cout << "syntax error: expected file for input \"<\"\n";
                         break;
                     }
 
-                    continue;
+                    redir_set.push_back(redir(REDIR_TYPE_INPUT));
+                    continue; // default action
 
-                } else if(cmd == RDIR_OUTPUT_SYM) {
-                    if(pipe_i == tokens_pipe.size() - 1) {
+                } else if(cmd == REDIR_SYM_OUTPUT) { // '>' output redirection operator
+                    if(redir_i == tokens_redir.size() - 1) {
                         syntax_err = 1;
                         std::cout << "syntax error: expected file for output \">\"\n";
                         break;
                     }
 
-                    // skip to next consecutive output redir symbol
-                    if(tokens_pipe.at(pipe_i + 1) == RDIR_OUTPUT_SYM) {
-                        pipe_i++;
+                    if(redir_i > 0 && tokens_redir.at(redir_i-1) == REDIR_SYM_OUTPUT) {
+                        // '>>' operator
+                        redir_set.pop_back(); // erase old TYPE_OUTPUT
+                        redir_set.push_back(REDIR_TYPE_OUTPUT_APP);
                         continue;
-                    } 
+                    }
+
+                    redir_set.push_back(REDIR_TYPE_OUTPUT);
+                    continue; // default action
 
                 } else {
+                    redir_set.push_back(redir(REDIR_TYPE_CMD));
                     cmd_set.push_back(cmd);
                 }
             }
