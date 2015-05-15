@@ -203,17 +203,25 @@ int run() {
 
             if(syntax_err != 0) break;
 
-            for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++)
-                _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
+            bool single_cmd = cmd_set.size() == 1;
+
+            if(!single_cmd) {
+                for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++)
+                    _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
 
 
-            // connection pass
-            for(unsigned int redir_i = 0; redir_i < redir_set.size(); redir_i++) {
-                
+                // connection pass
+                for(unsigned int redir_i = 0; redir_i < redir_set.size(); redir_i++) {
+
+
+                }
             }
 
 
-            // command running pass
+            // file descriptor forwarded from pipe
+            int fd_fwd = 0;
+
+            // command execution pass
             for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
 
                 auto cmd = cmd_set.at(cmd_i);
@@ -243,8 +251,24 @@ int run() {
                 // exit only if first word is "exit", after formatting
                 if(tokens_word.at(0) == "exit") return 0;
 
+
                 // execute command
-                prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
+                if(single_cmd)
+                    execute(cmd_argv[0], cmd_argv.data());
+                else
+                    execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
+            }
+
+            // wait for all child processes to end and save exit code
+            int pid_child;
+            while((pid_child = waitpid(-1, &prev_exit_code, 0))) {
+                if(pid_child == -1) break;
+                else {
+                    if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
+                        perror("error: waitpid on child processes");
+                        break;
+                    }
+                }
             }
         }
     }
@@ -294,19 +318,12 @@ int execute(struct redir* pipe, int* fd_fwd, const char* path, char* const argv[
     _PRINT("created process with id " << pid)
 
     if(pid == -1) {
-        perror("fork");
+        perror("error: fork");
         return -1;
     } else if(pid == 0) {
         execvp(path, argv);
         perror(path);
         exit(1);
-    } else {
-
-        int exit_code; 
-        
-        // pass exit code along
-        if(waitpid(pid, &exit_code, 0) == -1) perror("waitpid");
-        return exit_code;    
     }
 
     return 0;
