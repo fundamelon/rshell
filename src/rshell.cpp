@@ -1,13 +1,23 @@
 // RSHELL.CPP
 // Main source code for rshell
 
-// enable debug messages
-//#define RSHELL_DEBUG
+// enable debug messages and macros
+#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
 
 #define COL_DEFAULT "\033[39m"
 #define COL_PREPEND "\033[32m"
+#define COL_DEBUG   "\033[33m"
+
+// debug print macro
+#ifdef RSHELL_DEBUG
+#define _PRINT(stream) std::cout << COL_DEBUG << "[DEBUG] " \
+                                 << COL_DEFAULT << stream \
+                                 << std::endl << std::flush;
+#else
+#define _PRINT(stream)
+#endif
 
 #include "unistd.h"
 #include "sys/wait.h"
@@ -66,6 +76,8 @@ int run() {
     std::string usr_input;
     int prev_exit_code = 0;
 
+    _PRINT("starting in debug mode");
+
     while(true) {
         
         bool skip_cmd = false;
@@ -78,13 +90,10 @@ int run() {
         for(unsigned int i = 0; i < tokens_spc.size(); i++) {
 
             std::string spc = tokens_spc.at(i);
-
             boost::trim(spc);
 
-#ifdef RSHELL_DEBUG
-            std::cout << "<" << spc << ">" << std::endl;
-#endif
-
+            _PRINT("initial parser: <" << spc << ">")
+            
             if(spc == "") continue;
 
             // assumption: a connector token has no whitespace
@@ -129,11 +138,13 @@ int run() {
             prev_spc = "";
             if(skip_cmd) continue;
 
+
             tokens_redir = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
             int syntax_err = 0;
 
             std::vector<std::string> cmd_set;
             std::vector<struct redir> redir_set;
+
 
             // redirection syntax pass
             for(unsigned int redir_i = 0; redir_i < tokens_redir.size(); redir_i++) {
@@ -141,7 +152,6 @@ int run() {
                 std::string cmd = tokens_redir.at(redir_i);
 
                 boost::trim(cmd);
-                std::cout << "<" << cmd << ">\n";
 
                 if(cmd == "") { 
                 //    tokens_redir.erase(tokens_redir.begin() + redir_i);
@@ -149,6 +159,8 @@ int run() {
                     syntax_err = 2;
                     break;
                 }
+
+                cmd_set.push_back(cmd);
 
                 if(cmd == REDIR_SYM_PIPE) { // '|' piping operator
                     if(redir_i == 0) {
@@ -184,6 +196,7 @@ int run() {
                     if(redir_i > 0 && tokens_redir.at(redir_i-1) == REDIR_SYM_OUTPUT) {
                         // '>>' operator
                         redir_set.pop_back(); // erase old TYPE_OUTPUT
+                        cmd_set.pop_back();
                         redir_set.push_back(REDIR_TYPE_OUTPUT_APP);
                         continue;
                     }
@@ -193,11 +206,14 @@ int run() {
 
                 } else {
                     redir_set.push_back(redir(REDIR_TYPE_CMD));
-                    cmd_set.push_back(cmd);
                 }
             }
 
             if(syntax_err != 0) break;
+
+            for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++) {
+                _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
+            }
 
             // command running pass
             for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
@@ -219,9 +235,8 @@ int run() {
                 std::vector<char*> cmd_argv(tokens_word.size() + 1);
                 for(unsigned int k = 0; k < tokens_word.size(); k++) { 
                     cmd_argv[k] = &tokens_word[k][0]; 
-#ifdef RSHELL_DEBUG 
-                    std::cout << "\t" << "<" << tokens_word.at(k) << ">" << std::endl;
-#endif
+                    
+                    _PRINT("\t" << "<" << tokens_word.at(k) << ">");
                 }            
 
                 // exit only if first word is "exit", after formatting
@@ -265,15 +280,11 @@ std::string prompt() {
 /* fork and exec a program, complete error checking */
 int execute(const char* path, char* const argv[]) {
 
-#ifdef RSHELL_DEBUG
-    std::cout << "executing " << path << std::endl;
-#endif
+    _PRINT("executing " << path);
     
     int pid = fork();
 
-#ifdef RSHELL_DEBUG
-    std::cout << "created process with id " << pid << std::endl;
-#endif
+    _PRINT("created process with id " << pid)
 
     if(pid == -1) {
         perror("fork");
@@ -330,9 +341,6 @@ std::vector<std::string> tokenize(std::string s, std::string r) {
         
 
     for(unsigned int i = 0; i < token_vec.size(); i++) {
-#ifdef RSHELL_DEBUG
-//        std::cout << "[" << token_vec.at(i) << "]" << std::endl; 
-#endif
         if(token_vec.at(i) == "") token_vec.erase(token_vec.begin() + i);
     } 
         
