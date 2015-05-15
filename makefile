@@ -39,7 +39,7 @@ mv: $(MV_OBJ)
 
 $(ODIR)%.o: $(SDIR)%.cpp
 	$(MKDIR_P) $(ODIR)
-	$(CXX) -MMD -c -o $@ $< $(CXXFLAGS)
+	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 
 .PHONY: clean

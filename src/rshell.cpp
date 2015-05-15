@@ -135,18 +135,20 @@ int run() {
             std::vector<std::string> cmd_set;
             std::vector<struct redir> redir_set;
 
-            // syntax pass
+            // redirection syntax pass
             for(unsigned int redir_i = 0; redir_i < tokens_redir.size(); redir_i++) {
 
                 std::string cmd = tokens_redir.at(redir_i);
 
-                if(cmd == "") { 
-                    tokens_redir.erase(tokens_redir.begin() + redir_i);
-                    std::cout << "syntax error: unexpected null command\n";
-                    break;
-                }
                 boost::trim(cmd);
                 std::cout << "<" << cmd << ">\n";
+
+                if(cmd == "") { 
+                //    tokens_redir.erase(tokens_redir.begin() + redir_i);
+                    std::cout << "syntax error: unexpected null command\n";
+                    syntax_err = 2;
+                    break;
+                }
 
                 if(cmd == REDIR_SYM_PIPE) { // '|' piping operator
                     if(redir_i == 0) {
@@ -195,7 +197,7 @@ int run() {
                 }
             }
 
-            if(syntax_err == 1) break;
+            if(syntax_err != 0) break;
 
             // command running pass
             for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
