@@ -5,6 +5,7 @@
 #include "sys/wait.h"
 #include "stdio.h"
 #include "errno.h"
+#include "signal.h"
 
 #include <iostream>
 #include <string>
@@ -53,10 +54,19 @@ enum REDIR_TYPE {
     REDIR_TYPE_OUTPUT     = 0x008,
     REDIR_TYPE_OUTPUT_APP = 0x010
 };
+
+
+volatile sig_atomic_t sigint_flag = 0;
+void catch_interrupt(int sig_num) {
+    sigint_flag = 1;
+}
  
 
 /* Initialize environment */
-void init() {}
+void init() {
+
+    signal(SIGINT, catch_interrupt);
+}
 
 
 /* Main loop - controls command line, parsing, and execution logic */
@@ -71,7 +81,12 @@ int run() {
     _PRINT("starting in debug mode");
 
     while(true) {
-        
+       
+        if(sigint_flag) {  
+            _PRINT("interrupt signal recieved, ignoring")
+            sigint_flag = 0;
+        }
+
         bool skip_cmd = false;
         std::string prev_spc = "";
         usr_input = prompt();
@@ -255,8 +270,16 @@ int run() {
                 // execute command
                 if(single_cmd)
                     execute(cmd_argv[0], cmd_argv.data());
-                else
+                else {
+
+                    // piping logic
+                    /*
+                    if(cmd_i + 1 < cmd_set.size()) {
+
+                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_
+                    */
                     execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
+                }
             }
 
             // wait for all child processes to end and save exit code
