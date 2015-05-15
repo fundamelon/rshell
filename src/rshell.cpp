@@ -1,6 +1,20 @@
 // RSHELL.CPP
 // Main source code for rshell
 
+#include "unistd.h"
+#include "sys/wait.h"
+#include "stdio.h"
+#include "errno.h"
+
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/regex.hpp>
+#include <boost/regex.hpp>
+
+
 // enable debug messages and macros
 #define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
@@ -19,18 +33,6 @@
 #define _PRINT(stream)
 #endif
 
-#include "unistd.h"
-#include "sys/wait.h"
-#include "stdio.h"
-#include "errno.h"
-
-#include <iostream>
-#include <string>
-#include <vector>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/regex.hpp>
-#include <boost/regex.hpp>
 
 #include "rshell.h"
 
@@ -50,16 +52,6 @@ enum REDIR_TYPE {
     REDIR_TYPE_INPUT      = 0x004,
     REDIR_TYPE_OUTPUT     = 0x008,
     REDIR_TYPE_OUTPUT_APP = 0x010
-};
-
-
-struct redir {
-    redir(int t) : type(t) {}
-    redir(int r, int l, int t) : type(t) { pids[0] = r; pids[1] = l; }
-    int type;
-    int pipefd[2] = { 0, 1 };
-    int pids[2];
-    const char* redir_file;
 };
  
 
@@ -211,14 +203,23 @@ int run() {
 
             if(syntax_err != 0) break;
 
-            for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++) {
+            for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++)
                 _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
+
+
+            // connection pass
+            for(unsigned int redir_i = 0; redir_i < redir_set.size(); redir_i++) {
+                
             }
+
 
             // command running pass
             for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
 
                 auto cmd = cmd_set.at(cmd_i);
+                auto redir = redir_set.at(cmd_i);
+
+                if(redir.type != REDIR_TYPE_CMD) continue;
 
                 tokens_word = toksplit(cmd, " ");
                 for(unsigned int j = 0; j < tokens_word.size(); j++) {
@@ -242,10 +243,8 @@ int run() {
                 // exit only if first word is "exit", after formatting
                 if(tokens_word.at(0) == "exit") return 0;
 
+                // execute command
                 prev_exit_code = execute(cmd_argv[0], cmd_argv.data());
-
-                // if execvp returned and had error, stop the process
-                //  if(err_num == 1) return 1;
             }
         }
     }
@@ -277,10 +276,18 @@ std::string prompt() {
 }
 
 
+
 /* fork and exec a program, complete error checking */
 int execute(const char* path, char* const argv[]) {
+    return execute(NULL, NULL, path, argv);
+}
 
-    _PRINT("executing " << path);
+
+
+/* fork and exec a program, complete error checking */
+int execute(struct redir* pipe, int* fd_fwd, const char* path, char* const argv[]) {
+
+    _PRINT("executing " << path)
     
     int pid = fork();
 
