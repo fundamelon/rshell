@@ -2,8 +2,11 @@
 // Main source code for rshell
 
 #include "unistd.h"
-#include "sys/wait.h"
 #include "stdio.h"
+#include "sys/types.h"
+#include "sys/stat.h"
+#include "sys/wait.h"
+#include "fcntl.h"
 #include "errno.h"
 #include "signal.h"
 
@@ -38,6 +41,7 @@
 #include "rshell.h"
 
 
+
 const char* CONN_AMP = "&&";
 const char* CONN_PIPE = "||";
 const char* CONN_SEMIC = ";";
@@ -56,17 +60,20 @@ enum REDIR_TYPE {
 };
 
 
+
 volatile sig_atomic_t sigint_flag = 0;
 void catch_interrupt(int sig_num) {
     sigint_flag = 1;
 }
  
 
+
 /* Initialize environment */
 void init() {
 
     signal(SIGINT, catch_interrupt);
 }
+
 
 
 /* Main loop - controls command line, parsing, and execution logic */
@@ -273,11 +280,22 @@ int run() {
                 else {
 
                     // piping logic
-                    /*
+                    
                     if(cmd_i + 1 < cmd_set.size()) {
 
-                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_
-                    */
+                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_OUTPUT) {
+                            const char* filepath = cmd_set.at(cmd_i + 2).c_str();
+                            int output_fd = open(filepath, O_CREAT);
+                            if(output_fd == -1) {
+                                perror("input redirect: open file");
+                                break;
+                            }
+
+                            fd_fwd = output_fd;
+                            cmd_i += 2;
+                        }
+                    }
+
                     execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
                 }
             }
@@ -332,9 +350,18 @@ int execute(const char* path, char* const argv[]) {
 
 
 /* fork and exec a program, complete error checking */
-int execute(struct redir* pipe, int* fd_fwd, const char* path, char* const argv[]) {
+int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
 
     _PRINT("executing " << path)
+
+    bool use_redir = (redir_info != NULL);
+
+    if(use_redir) {
+        if(pipe(redir_info->pipefd) != 0) {
+            perror("pipe");
+            return errno;
+        }
+    }
     
     int pid = fork();
 

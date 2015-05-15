@@ -21,7 +21,7 @@ int run();
 std::string prompt();
 
 int execute(const char* path, char* const argv[]);
-int execute(struct redir* pipe, int* fd_fwd, const char* path, char* const argv[]);
+int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]);
 
 std::vector<std::string> tokenize(std::string);
 std::vector<std::string> tokenize(std::string, std::string);
