@@ -20,7 +20,7 @@
 
 
 // enable debug messages and macros
-#define RSHELL_DEBUG
+//#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
 
@@ -34,7 +34,7 @@
                                  << COL_DEFAULT << stream \
                                  << std::endl << std::flush;
 #else
-#define _PRINT(stream)
+#define _PRINT(stream) ;
 #endif
 
 
@@ -208,6 +208,16 @@ int run() {
                     redir_set.push_back(redir(REDIR_TYPE_INPUT));
                     continue; // default action
 
+                } else if(cmd == REDIR_SYM_INPUT_STR) { // '<<<' operator
+                    if(redir_i == tokens_redir.size() - 1) {
+                        syntax_err = 1;
+                        std::cout << "syntax error: expected file for input \"<\"\n";
+                        break;
+                    }
+
+                    redir_set.push_back(redir(REDIR_TYPE_INPUT | REDIR_TYPE_INPUT_STR));
+                    continue; // default action
+
                 } else if(cmd == REDIR_SYM_OUTPUT) { // '>' output redirection operator
                     if(redir_i == tokens_redir.size() - 1) {
                         syntax_err = 1;
@@ -247,10 +257,9 @@ int run() {
             bool single_cmd = cmd_set.size() == 1;
             std::vector<int> open_fds;
 
-            if(!single_cmd) {
+            if(!single_cmd)
                 for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++)
                     _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
-            }
 
 
             // file descriptor forwarded between, default: std input
@@ -346,7 +355,7 @@ int run() {
             // close all latent fds
             for(auto fd : open_fds) {
                 _PRINT("closing fd " << fd)
-                if(close(fd) == -1 && fd > 2) { perror("close"); break; }
+                if(fd > 2 && close(fd) == -1) { perror("close"); break; }
             }
 
             //if(prev_exit_code != 0) break;
@@ -418,6 +427,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
     int fd_in_old = STDIN_FILENO, fd_in_new = STDIN_FILENO; // stdin
     int fd_out_old = STDOUT_FILENO, fd_out_new = STDOUT_FILENO; // stdout
 
+    int pipefd_str[2]; // for string input
 
     if(use_redir) {
         _PRINT("execute: using redirection " << redir_info->type)
@@ -448,16 +458,35 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
                 // input redir setup
                 if(redir_info->type & REDIR_TYPE_INPUT) {
-                    _PRINT("redir: input from file " << redir_info->file)
+                    if(redir_info->type & REDIR_TYPE_INPUT_STR) {
+                        // input raw string
+                        _PRINT("redir: input string " << redir_info->file)
+                        redir_info->file_fd = 1;
 
-                    fd_in_new = open(redir_info->file, O_RDONLY | O_CLOEXEC);
-                    if(fd_in_new == -1) { 
-                        perror("input redirect: open"); 
-                        return errno;
+                        if(pipe2(pipefd_str, O_CLOEXEC) != 0) {
+                            perror("pipe");
+                            return errno;
+                        }
+
+                        char* instring = strdup(redir_info->file);
+                        strcat(instring, "\n"); // append newline
+                        redir_info->file = instring;
+
+                        fd_in_new = pipefd_str[0];
+
+                    } else {
+                        // input from file
+                        _PRINT("redir: input from file " << redir_info->file)
+
+                        fd_in_new = open(redir_info->file, O_RDONLY | O_CLOEXEC);
+                        if(fd_in_new == -1) { 
+                            perror("input redirect: open"); 
+                            return errno;
+                        }
+
+                        redir_info->file_fd = fd_in_new;
+                        // rest already taken care of in piping block above
                     }
-
-                    redir_info->file_fd = fd_in_new;
-                    // rest already taken care of in piping block above
                 }
 
                 // output redir setup
@@ -486,8 +515,6 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                 // does not modify forwarded fd (convention)
                 fd_in_new = *fd_fwd;           
             }
-
-
         }
     }
 
@@ -537,12 +564,38 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                     exit(errno);
                 }
             }
+
+            if(redir_info->type & REDIR_TYPE_INPUT_STR) {
+                // close write end of str pipe
+                if(close(pipefd_str[1]) == -1) {
+                    perror("str pipe read end: close");
+                    exit(errno);
+                }
+            }
         }
 
         execvp(path, argv);
         perror(path);
         exit(1);
     } else if(use_redir) { // parent
+        if(redir_info->type & REDIR_TYPE_INPUT_STR) {
+            // write string into child's input pipe
+            // totally completely code-injection proof i swear
+            const char* s = redir_info->file;
+            if(write(pipefd_str[1], s, strlen(s)) == -1) {
+                perror("input from string: write");
+                return errno;
+            }
+
+            if(close(pipefd_str[0]) == -1) {
+                perror("close");
+                return errno;
+            }
+            if(close(pipefd_str[1]) == -1) {
+                perror("close");
+                return errno;
+            }
+        }
     }
 
     if(use_redir) _PRINT("redir: forwarding fd " << *fd_fwd)
