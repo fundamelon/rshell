@@ -100,7 +100,8 @@ int run() {
         bool skip_cmd = false;
         std::string prev_spc = "";
         usr_input = prompt();
- 
+
+        // split input line into connector-delimited complex commands
         // regex '||', '&&', ';', or '#'
         tokens_spc = tokenize(usr_input, "(\\|\\||\\&\\&|;|#)");
 
@@ -116,28 +117,26 @@ int run() {
             // assumption: a connector token has no whitespace
             if(         spc == std::string(CONN_AMP)) {
                 
-                prev_spc = spc;
                 if(i == 0 || prev_spc != "") {  
                     std::cout << "syntax error: bad token \"" << CONN_AMP << "\"\n";
                     break;
                 } else if(prev_exit_code != 0  && i != 0) {
                     skip_cmd = true; 
-                    continue;
                 }
                
+                prev_spc = spc;
                 continue;
 
             } else if(  spc == std::string(CONN_PIPE)) {
                
-                prev_spc = spc;
                 if(i == 0 || prev_spc != "") { 
                     std::cout << "syntax error: bad token \"" << CONN_PIPE << "\"\n";
                     break;
                 } else if(prev_exit_code == 0 && i != 0) {
                     skip_cmd = true;
-                    continue;
                 } 
-       
+                
+                prev_spc = spc;
                 continue;
 
             } else if(  spc == std::string(CONN_SEMIC)) {
@@ -149,8 +148,9 @@ int run() {
                 } else {
                     prev_exit_code = 0;
                     skip_cmd = false;
-                    continue;
                 }
+
+                continue;
 
             } else if(  spc == std::string(TOKN_COMMENT)) {
                 break;
@@ -160,6 +160,7 @@ int run() {
             if(skip_cmd) continue;
 
 
+            // begin parsing complex command
             tokens_redir = tokenize(spc, "\\|+|<+|>+"); // regex '|', '<', or '>'
             int syntax_err = 0;
 
@@ -238,9 +239,10 @@ int run() {
 
                 } else // normal command
                     redir_set.push_back(redir(REDIR_TYPE_CMD));
-            }
+            } // end redirection syntax pass
 
             if(syntax_err != 0) break;
+
 
             bool single_cmd = cmd_set.size() == 1;
             std::vector<int> open_fds;
@@ -322,13 +324,17 @@ int run() {
                             open_fds.push_back(redir.pipefd[0]);
                         if(redir.pipefd[1] != STDOUT_FILENO)
                             open_fds.push_back(redir.pipefd[1]);
+                    } else if(redir.type == REDIR_TYPE_INPUT || 
+                            redir.type == REDIR_TYPE_OUTPUT) {
+                        open_fds.push_back(redir.file_fd);
                     }
                 }
-            }
+            } // end command execution pass
 
-            // close all hanging fds
+
+            // close all latent fds
             for(auto fd : open_fds)
-                if(close(fd) == -1) { perror("close"); break; }
+                if(close(fd) == -1 && fd > 2) { perror("close"); break; }
 
             //if(prev_exit_code != 0) break;
 
@@ -340,7 +346,7 @@ int run() {
 
                     _PRINT("child process terminated, pid: " << pid_child)
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
-                        if(!prev_exit_code == errno) // prevent repetition of errmsgs
+                        if(prev_exit_code != errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
                         break;
                     }
@@ -392,26 +398,26 @@ int execute(const char* path, char* const argv[]) {
  */
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
 
-    _PRINT("*** executing " << path)
+    _PRINT("*** execute " << path)
 
     bool use_redir = (redir_info != NULL);
 
     int fd_in_old = STDIN_FILENO, fd_in_new = STDIN_FILENO; // stdin
     int fd_out_old = STDOUT_FILENO, fd_out_new = STDOUT_FILENO; // stdout
 
+
     if(use_redir) {
         _PRINT("execute: using redirection")
-        _PRINT("forwarded fd: " << *fd_fwd)
-
+        _PRINT("redir: forwarded fd: " << *fd_fwd)
 
         if(redir_info->type == REDIR_TYPE_PIPE) {
             // expects forwarded fd from chain
             _PRINT("redir: piping")
 
             fd_in_new = *fd_fwd;
-            _PRINT("new fd: " << fd_in_new)
 
-            if(pipe(redir_info->pipefd) != 0) {
+            //if(pipe(redir_info->pipefd) != 0) {
+            if(pipe2(redir_info->pipefd, O_CLOEXEC) != 0) {
                 perror("pipe");
                 return errno;
             }
@@ -419,7 +425,6 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             // set to attach pipe to output, forward read fd, close old fd_fwd
             fd_out_new = redir_info->pipefd[1];
             *fd_fwd = redir_info->pipefd[0];
-            _PRINT("new fd: " << fd_in_new)
         }
 
         if(redir_info->type == REDIR_TYPE_OUTPUT) {
@@ -447,7 +452,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
     int pid = fork();
 
-    if(pid != 0) _PRINT("created process with id " << pid)
+    if(pid != 0) _PRINT("execute: created process with id " << pid)
 
     if(pid == -1) {
         perror("error: fork");
@@ -499,6 +504,8 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
     } else if(use_redir) { // parent
     }
 
+    if(use_redir) _PRINT("redir: forwarding fd " << *fd_fwd)
+    _PRINT("*** execute " << path << ": success")
     return 0;
 }
 
