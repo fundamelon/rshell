@@ -7,11 +7,11 @@
 
 struct redir {
     redir(int t) : type(t) {}
-    redir(int r, int l, int t) : type(t) { pids[0] = r; pids[1] = l; }
+    redir(int r, int l, int t) : type(t) { pipefd[0] = r; pipefd[1] = l; }
     int type;
     int pipefd[2] = { 0, 1 };
-    int pids[2];
     const char* file;
+    int file_fd;
 };
 
 

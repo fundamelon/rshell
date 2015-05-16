@@ -71,7 +71,7 @@ void catch_interrupt(int sig_num) {
 /* Initialize environment */
 void init() {
 
-    signal(SIGINT, catch_interrupt);
+    //signal(SIGINT, catch_interrupt);
 }
 
 
@@ -226,22 +226,16 @@ int run() {
             if(syntax_err != 0) break;
 
             bool single_cmd = cmd_set.size() == 1;
+            std::vector<int> open_fds;
 
             if(!single_cmd) {
                 for(unsigned int test_i = 0; test_i < cmd_set.size(); test_i++)
                     _PRINT("redir parser: \"" << cmd_set.at(test_i) << "\" : " << redir_set.at(test_i).type)
-
-
-                // connection pass
-                for(unsigned int redir_i = 0; redir_i < redir_set.size(); redir_i++) {
-
-
-                }
             }
 
 
-            // file descriptor forwarded from pipe, default: std input
-            int fd_fwd = 0;
+            // file descriptor forwarded between, default: std input
+            int fd_fwd = STDIN_FILENO;
 
             // command execution pass
             for(unsigned int cmd_i = 0; cmd_i < cmd_set.size(); cmd_i++) {
@@ -249,6 +243,7 @@ int run() {
                 auto cmd = cmd_set.at(cmd_i);
                 auto redir = redir_set.at(cmd_i);
 
+                // no action on redir operators
                 if(redir.type != REDIR_TYPE_CMD) continue;
 
                 tokens_word = toksplit(cmd, " ");
@@ -282,26 +277,46 @@ int run() {
                     // piping logic
                     
                     if(cmd_i + 1 < cmd_set.size()) {
+                       
+                        // '|' pipe redirection
+                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_PIPE) {
+                            redir.type = REDIR_TYPE_PIPE;
+                        }
 
-                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_OUTPUT) {
+                        // '>' output redirection
+                        else if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_OUTPUT) {
                             const char* filepath = cmd_set.at(cmd_i + 2).c_str();
                             redir.file = filepath;
-                            redir.type = redir_set.at(cmd_i + 1).type;
+                            redir.type = REDIR_TYPE_OUTPUT;
                             cmd_i += 2;
                         }
                     }
 
                     prev_exit_code = execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
+
+                    // collect open fds
+                    if(redir.type == REDIR_TYPE_PIPE) {
+                        if(redir.pipefd[0] != STDIN_FILENO) 
+                            open_fds.push_back(redir.pipefd[0]);
+                        if(redir.pipefd[1] != STDOUT_FILENO)
+                            open_fds.push_back(redir.pipefd[1]);
+                    }
                 }
             }
 
-            if(prev_exit_code != 0) break;
+            // close all hanging fds
+            for(auto fd : open_fds)
+                if(close(fd) == -1) { perror("close"); break; }
+
+            //if(prev_exit_code != 0) break;
 
             // wait for all child processes to end and save exit code
             int pid_child;
             while((pid_child = waitpid(-1, &prev_exit_code, 0))) {
                 if(pid_child == -1) break;
                 else {
+
+                    _PRINT("child process terminated, pid: " << pid_child)
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
                         if(!prev_exit_code == errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
@@ -349,23 +364,57 @@ int execute(const char* path, char* const argv[]) {
 
 
 
-/* fork and exec a program, complete error checking */
+/* fork and exec a program, complete error checking
+ *      redir_info: struct containing all redirection data
+ *      fd_fwd: forwarded fd for chaining pipes
+ */
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
 
     _PRINT("*** executing " << path)
 
     bool use_redir = (redir_info != NULL);
 
-    // initialize pipe
+    int fd_in_old = STDIN_FILENO, fd_in_new = STDIN_FILENO; // stdin
+    int fd_out_old = STDOUT_FILENO, fd_out_new = STDOUT_FILENO; // stdout
+
     if(use_redir) {
         _PRINT("execute: using redirection")
         _PRINT("forwarded fd: " << *fd_fwd)
-        if(pipe(redir_info->pipefd) != 0) {
-            perror("pipe");
-            return errno;
+
+
+        if(redir_info->type == REDIR_TYPE_PIPE) {
+            // expects forwarded fd from chain
+            _PRINT("redir: piping")
+
+            fd_in_new = *fd_fwd;
+
+            if(pipe(redir_info->pipefd) != 0) {
+                perror("pipe");
+                return errno;
+            }
+
+            // set to attach pipe to output, forward read fd, close old fd_fwd
+            fd_out_new = redir_info->pipefd[1];
+            *fd_fwd = redir_info->pipefd[0];
+        }
+
+        if(redir_info->type == REDIR_TYPE_OUTPUT) {
+            // expects output file in redir_info->redir_file
+            _PRINT("redir: output to file " << redir_info->file)
+            fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY);
+            if(fd_out_new == -1) {
+                perror("output redirect: open");
+                return errno;
+            }
+
+            redir_info->file_fd = fd_out_new;
+
+            // does not modify forwarded fd (convention)
+            fd_in_new = *fd_fwd;
+
         }
     }
-    
+
     int pid = fork();
 
     if(pid != 0) _PRINT("created process with id " << pid)
@@ -373,40 +422,42 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
     if(pid == -1) {
         perror("error: fork");
         return -1;
-    } else if(pid == 0) {
-        // fd redirection
+    } else if(pid == 0) { // child
+        // fd redirection swapping
         if(use_redir) {
-            if(redir_info->type == REDIR_TYPE_OUTPUT) {
 
-                // expects output file in redir_info->redir_file
-                _PRINT("redir: output to file " << redir_info->file)
-                int output_fd = open(redir_info->file, O_CREAT | O_WRONLY);
-                if(output_fd == -1) {
-                    perror("output redirect: open");
+            // redirect stdin
+            if(fd_in_old != fd_in_new) {
+                if(close(fd_in_old) == -1) {
+                    perror("input redirect: close");
                     exit(errno);
                 }
 
-                if(*fd_fwd != 0) {
-                    if(close(0) == -1) {
-                        perror("input redirect: close");
-                        exit(errno);
-                    }
-
-                    // input from forwarded fd
-                    if(dup(*fd_fwd) == -1) {
-                        perror("input redirect: dup");
-                        exit(errno);
-                    }
+                // input from forwarded fd
+                if(dup(fd_in_new) == -1) {
+                    perror("input redirect: dup");
+                    exit(errno);
                 }
+            }
 
-                if(close(1) == -1) {
+            // redirect stdout
+            if(fd_out_old != fd_out_new) {
+                if(close(fd_out_old) == -1) {
                     perror("output redirect: close");
                     exit(errno);
                 }
 
                 // output to redir file
-                if(dup(output_fd) == -1) {
+                if(dup(fd_out_new) == -1) {
                     perror("output redirect: dup");
+                    exit(errno);
+                }
+            }
+ 
+            if(redir_info->type == REDIR_TYPE_PIPE) {
+                // close read end of pipe
+                if(close(redir_info->pipefd[0]) == -1) {
+                    perror("pipe read end: close");
                     exit(errno);
                 }
             }
@@ -415,6 +466,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
         execvp(path, argv);
         perror(path);
         exit(1);
+    } else if(use_redir) { // parent
     }
 
     return 0;
