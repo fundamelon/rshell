@@ -307,6 +307,11 @@ int run() {
                             redir.type = REDIR_TYPE_OUTPUT;
                             cmd_i += 2;
                         }
+                    } else if(cmd_i > 1 && redir_set.at(cmd_i - 1).type == REDIR_TYPE_PIPE) {
+                        // end of command after pipe: use output redirection
+                        redir.file = NULL;
+                        redir.type = REDIR_TYPE_OUTPUT;
+                        redir.file_fd = STDOUT_FILENO; // override write file
                     }
 
                     prev_exit_code = execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
@@ -404,6 +409,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             _PRINT("redir: piping")
 
             fd_in_new = *fd_fwd;
+            _PRINT("new fd: " << fd_in_new)
 
             if(pipe(redir_info->pipefd) != 0) {
                 perror("pipe");
@@ -413,15 +419,22 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             // set to attach pipe to output, forward read fd, close old fd_fwd
             fd_out_new = redir_info->pipefd[1];
             *fd_fwd = redir_info->pipefd[0];
+            _PRINT("new fd: " << fd_in_new)
         }
 
         if(redir_info->type == REDIR_TYPE_OUTPUT) {
-            // expects output file in redir_info->redir_file
-            _PRINT("redir: output to file " << redir_info->file)
-            fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY);
-            if(fd_out_new == -1) {
-                perror("output redirect: open");
-                return errno;
+            // expects forwarded fd from chain
+            // expects output file in redir_info->file (or NULL for stdout override)
+            if(redir_info->file != NULL) {
+                _PRINT("redir: output to file " << redir_info->file)
+                fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY);
+                if(fd_out_new == -1) {
+                    perror("output redirect: open");
+                    return errno;
+                }
+            } else {
+                // end of chain override
+                _PRINT("redir: end of pipe chain")
             }
 
             redir_info->file_fd = fd_out_new;
