@@ -49,14 +49,17 @@ const char* TOKN_COMMENT = "#";
 
 const char* REDIR_SYM_PIPE = "|";
 const char* REDIR_SYM_INPUT = "<";
+const char* REDIR_SYM_INPUT_STR = "<<<";
 const char* REDIR_SYM_OUTPUT = ">";
+const char* REDIR_SYM_OUTPUT_APP = ">>";
 
 enum REDIR_TYPE {
     REDIR_TYPE_CMD        = 0x001,
     REDIR_TYPE_PIPE       = 0x002,
     REDIR_TYPE_INPUT      = 0x004,
-    REDIR_TYPE_OUTPUT     = 0x008,
-    REDIR_TYPE_OUTPUT_APP = 0x010
+    REDIR_TYPE_INPUT_STR  = 0x008,
+    REDIR_TYPE_OUTPUT     = 0x010,
+    REDIR_TYPE_OUTPUT_APP = 0x020
 };
 
 
@@ -112,6 +115,8 @@ int run() {
 
             // assumption: a connector token has no whitespace
             if(         spc == std::string(CONN_AMP)) {
+                
+                prev_spc = spc;
                 if(i == 0 || prev_spc != "") {  
                     std::cout << "syntax error: bad token \"" << CONN_AMP << "\"\n";
                     break;
@@ -120,10 +125,11 @@ int run() {
                     continue;
                 }
                
-                prev_spc = spc;
                 continue;
 
             } else if(  spc == std::string(CONN_PIPE)) {
+               
+                prev_spc = spc;
                 if(i == 0 || prev_spc != "") { 
                     std::cout << "syntax error: bad token \"" << CONN_PIPE << "\"\n";
                     break;
@@ -132,19 +138,20 @@ int run() {
                     continue;
                 } 
        
-                prev_spc = spc;
                 continue;
 
             } else if(  spc == std::string(CONN_SEMIC)) {
+
+                prev_spc = spc;
                 if(i == 0)  {
                     std::cout << "syntax error: bad token \"" << CONN_SEMIC << "\"\n";
                     break;
                 } else {
                     prev_exit_code = 0;
                     skip_cmd = false;
-                    prev_spc = spc;
                     continue;
                 }
+
             } else if(  spc == std::string(TOKN_COMMENT)) {
                 break;
             }
@@ -153,7 +160,7 @@ int run() {
             if(skip_cmd) continue;
 
 
-            tokens_redir = tokenize(spc, "\\||<|>"); // regex '|', '<', or '>'
+            tokens_redir = tokenize(spc, "\\|+|<+|>+"); // regex '|', '<', or '>'
             int syntax_err = 0;
 
             std::vector<std::string> cmd_set;
@@ -207,20 +214,30 @@ int run() {
                         break;
                     }
 
-                    if(redir_i > 0 && tokens_redir.at(redir_i-1) == REDIR_SYM_OUTPUT) {
-                        // '>>' operator
-                        redir_set.pop_back(); // erase old TYPE_OUTPUT
-                        cmd_set.pop_back();
-                        redir_set.push_back(REDIR_TYPE_OUTPUT_APP);
-                        continue;
-                    }
-
                     redir_set.push_back(REDIR_TYPE_OUTPUT);
                     continue; // default action
 
-                } else {
+                } else if(cmd == REDIR_SYM_OUTPUT_APP) { // '>>' operator
+
+                    if(redir_i == tokens_redir.size() - 1) {
+                        syntax_err = 1;
+                        std::cout << "syntax error: expected file for output \">\"\n";
+                        break;
+                    }
+                        
+                    redir_set.push_back(REDIR_TYPE_OUTPUT_APP);
+                    continue;
+
+                } else if(cmd[0] == REDIR_SYM_PIPE[0] || 
+                        cmd[0] == REDIR_SYM_INPUT[0] ||
+                        cmd[0] == REDIR_SYM_OUTPUT[0]) { // invalid operator
+
+                    syntax_err = 1;
+                    std::cout << "syntax error: bad operator \"" << cmd << "\"\n";
+                    break;
+
+                } else // normal command
                     redir_set.push_back(redir(REDIR_TYPE_CMD));
-                }
             }
 
             if(syntax_err != 0) break;
