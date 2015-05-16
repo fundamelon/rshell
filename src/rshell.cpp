@@ -226,7 +226,7 @@ int run() {
                         break;
                     }
                         
-                    redir_set.push_back(REDIR_TYPE_OUTPUT_APP);
+                    redir_set.push_back(REDIR_TYPE_OUTPUT | REDIR_TYPE_OUTPUT_APP);
                     continue;
 
                 } else if(cmd[0] == REDIR_SYM_PIPE[0] || 
@@ -298,17 +298,20 @@ int run() {
                     if(cmd_i + 1 < cmd_set.size()) {
                        
                         // '|' pipe redirection
-                        if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_PIPE) {
+                        if(redir_set.at(cmd_i+1).type == REDIR_TYPE_PIPE) {
                             redir.type = REDIR_TYPE_PIPE;
                         }
 
-                        // '>' output redirection
-                        else if(redir_set.at(cmd_i + 1).type == REDIR_TYPE_OUTPUT) {
+                        // '>' and '>>' output redirection
+                        else if(redir_set.at(cmd_i+1).type & REDIR_TYPE_OUTPUT) {
                             const char* filepath = cmd_set.at(cmd_i + 2).c_str();
                             redir.file = filepath;
-                            redir.type = REDIR_TYPE_OUTPUT;
+                            redir.type = redir_set.at(cmd_i+1).type;
                             cmd_i += 2;
+                        } else {
+                            std::cout << "error: unknown redirection type\n";
                         }
+
                     } else if(cmd_i > 1 && redir_set.at(cmd_i - 1).type == REDIR_TYPE_PIPE) {
                         // end of command after pipe: use output redirection
                         redir.file = NULL;
@@ -427,12 +430,13 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             *fd_fwd = redir_info->pipefd[0];
         }
 
-        if(redir_info->type == REDIR_TYPE_OUTPUT) {
+        if(redir_info->type & REDIR_TYPE_OUTPUT) {
             // expects forwarded fd from chain
             // expects output file in redir_info->file (or NULL for stdout override)
             if(redir_info->file != NULL) {
                 _PRINT("redir: output to file " << redir_info->file)
-                fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY);
+                int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : 0;
+                fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag);
                 if(fd_out_new == -1) {
                     perror("output redirect: open");
                     return errno;
