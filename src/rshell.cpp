@@ -297,16 +297,24 @@ int run() {
                     
                     if(cmd_i + 1 < cmd_set.size()) {
                        
-                        // '|' pipe redirection
+                        // '|' piping
                         if(redir_set.at(cmd_i+1).type == REDIR_TYPE_PIPE) {
                             redir.type = REDIR_TYPE_PIPE;
                         }
 
-                        // '>' and '>>' output redirection
-                        else if(redir_set.at(cmd_i+1).type & REDIR_TYPE_OUTPUT) {
+                        // '<', '>', '>>' file redirection
+                        else if(redir_set.at(cmd_i+1).type & 
+                                (REDIR_TYPE_INPUT | REDIR_TYPE_OUTPUT)) {
                             const char* filepath = cmd_set.at(cmd_i + 2).c_str();
                             redir.file = filepath;
                             redir.type = redir_set.at(cmd_i+1).type;
+
+                            // set to pipe if there exists a connector afterward
+                            if(cmd_i + 3 < cmd_set.size() && !(redir_set.at(cmd_i+3).type == REDIR_TYPE_CMD) ) {
+                                redir.type |= REDIR_TYPE_PIPE;
+                                cmd_i ++;
+                        }
+
                             cmd_i += 2;
                         } else {
                             std::cout << "error: unknown redirection type\n";
@@ -327,8 +335,7 @@ int run() {
                             open_fds.push_back(redir.pipefd[0]);
                         if(redir.pipefd[1] != STDOUT_FILENO)
                             open_fds.push_back(redir.pipefd[1]);
-                    } else if(redir.type == REDIR_TYPE_INPUT || 
-                            redir.type == REDIR_TYPE_OUTPUT) {
+                    } else if(redir.type & (REDIR_TYPE_INPUT | REDIR_TYPE_OUTPUT)) {
                         open_fds.push_back(redir.file_fd);
                     }
                 }
@@ -410,10 +417,10 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
 
     if(use_redir) {
-        _PRINT("execute: using redirection")
+        _PRINT("execute: using redirection " << redir_info->type)
         _PRINT("redir: forwarded fd: " << *fd_fwd)
 
-        if(redir_info->type == REDIR_TYPE_PIPE) {
+        if(redir_info->type & REDIR_TYPE_PIPE) {
             // expects forwarded fd from chain
             _PRINT("redir: piping")
 
@@ -430,26 +437,53 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             *fd_fwd = redir_info->pipefd[0];
         }
 
-        if(redir_info->type & REDIR_TYPE_OUTPUT) {
+        // file redirection
+        if(redir_info->type & (REDIR_TYPE_INPUT | REDIR_TYPE_OUTPUT)) {
             // expects forwarded fd from chain
             // expects output file in redir_info->file (or NULL for stdout override)
             if(redir_info->file != NULL) {
-                _PRINT("redir: output to file " << redir_info->file)
-                int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : 0;
-                fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag);
-                if(fd_out_new == -1) {
-                    perror("output redirect: open");
-                    return errno;
+
+                // input redir setup
+                if(redir_info->type & REDIR_TYPE_INPUT) {
+                    _PRINT("redir: input from file " << redir_info->file)
+
+                    fd_in_new = open(redir_info->file, O_RDONLY | O_CLOEXEC);
+                    if(fd_in_new == -1) { 
+                        perror("input redirect: open"); 
+                        return errno;
+                    }
+
+                    redir_info->file_fd = fd_in_new;
+                    // rest already taken care of in piping block above
+                }
+
+                // output redir setup
+                else if(redir_info->type & REDIR_TYPE_OUTPUT) {
+                    _PRINT("redir: output to file " << redir_info->file)
+                    int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : 0;
+                    fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag);
+                    if(fd_out_new == -1) {
+                        perror("output redirect: open");
+                        return errno;
+                    } 
+
+                    redir_info->file_fd = fd_out_new;
+                    // does not modify forwarded fd (convention)
+                    fd_in_new = *fd_fwd;                            
+
+                } else {
+                    std::cout << "error: something went crazy wrong with redir i/o\n";
+                    return -1;
                 }
             } else {
                 // end of chain override
                 _PRINT("redir: end of pipe chain")
+ 
+                redir_info->file_fd = fd_out_new;
+                // does not modify forwarded fd (convention)
+                fd_in_new = *fd_fwd;           
             }
 
-            redir_info->file_fd = fd_out_new;
-
-            // does not modify forwarded fd (convention)
-            fd_in_new = *fd_fwd;
 
         }
     }
