@@ -330,12 +330,13 @@ int run() {
                     prev_exit_code = execute(&redir, &fd_fwd, cmd_argv[0], cmd_argv.data());
 
                     // collect open fds
-                    if(redir.type == REDIR_TYPE_PIPE) {
+                    if(redir.type & REDIR_TYPE_PIPE) {
                         if(redir.pipefd[0] != STDIN_FILENO) 
                             open_fds.push_back(redir.pipefd[0]);
                         if(redir.pipefd[1] != STDOUT_FILENO)
                             open_fds.push_back(redir.pipefd[1]);
-                    } else if(redir.type & (REDIR_TYPE_INPUT | REDIR_TYPE_OUTPUT)) {
+                    }
+                    if(redir.type & (REDIR_TYPE_INPUT | REDIR_TYPE_OUTPUT)) {
                         open_fds.push_back(redir.file_fd);
                     }
                 }
@@ -343,8 +344,10 @@ int run() {
 
 
             // close all latent fds
-            for(auto fd : open_fds)
+            for(auto fd : open_fds) {
+                _PRINT("closing fd " << fd)
                 if(close(fd) == -1 && fd > 2) { perror("close"); break; }
+            }
 
             //if(prev_exit_code != 0) break;
 
@@ -422,8 +425,6 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
         if(redir_info->type & REDIR_TYPE_PIPE) {
             // expects forwarded fd from chain
-            _PRINT("redir: piping")
-
             fd_in_new = *fd_fwd;
 
             //if(pipe(redir_info->pipefd) != 0) {
@@ -431,6 +432,8 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                 perror("pipe");
                 return errno;
             }
+
+            _PRINT("redir: piping [" << redir_info->pipefd[0] << ", " << redir_info->pipefd[1] << "]")
 
             // set to attach pipe to output, forward read fd, close old fd_fwd
             fd_out_new = redir_info->pipefd[1];
@@ -460,7 +463,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                 // output redir setup
                 else if(redir_info->type & REDIR_TYPE_OUTPUT) {
                     _PRINT("redir: output to file " << redir_info->file)
-                    int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : 0;
+                    int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : O_TRUNC;
                     fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag);
                     if(fd_out_new == -1) {
                         perror("output redirect: open");
@@ -527,7 +530,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                 }
             }
  
-            if(redir_info->type == REDIR_TYPE_PIPE) {
+            if(redir_info->type & REDIR_TYPE_PIPE) {
                 // close read end of pipe
                 if(close(redir_info->pipefd[0]) == -1) {
                     perror("pipe read end: close");

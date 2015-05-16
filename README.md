@@ -28,6 +28,8 @@ rshell supports basic piping, as in bash.  the format ```cmd | cmd```, ```cmd < 
 Whitespace is ignored for pipes. They are not affected by connectors. 
 However, note that syntax errors with pipes are only detected at *runtime*, and will abort execution from that point onward.
 
+Note: ```cmd < file1 > file2``` does not function correctly, and should be avoided.
+
 #### other
 
 When ```ls``` is invoked, the flag ```--color``` is appended to enable colors.
