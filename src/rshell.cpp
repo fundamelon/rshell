@@ -20,7 +20,7 @@
 
 
 // enable debug messages and macros
-//#define RSHELL_DEBUG
+#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND
 
@@ -161,7 +161,8 @@ int run() {
 
 
             // begin parsing complex command
-            tokens_redir = tokenize(spc, "\\|+|<+|>+"); // regex '|', '<', or '>'
+            // regex '|', '<', '#>", or '>'
+            tokens_redir = tokenize(spc, "\\|+|<+|([0-9]*)>+"); 
             int syntax_err = 0;
 
             std::vector<std::string> cmd_set;
@@ -239,10 +240,10 @@ int run() {
                     redir_set.push_back(REDIR_TYPE_OUTPUT | REDIR_TYPE_OUTPUT_APP);
                     continue;
 
-                } else if(cmd[0] == REDIR_SYM_PIPE[0] || 
-                        cmd[0] == REDIR_SYM_INPUT[0] ||
-                        cmd[0] == REDIR_SYM_OUTPUT[0]) { // invalid operator
-
+                } else if(strstr(cmd.c_str(), REDIR_SYM_PIPE) || 
+                          strstr(cmd.c_str(), REDIR_SYM_INPUT) ||
+                          strstr(cmd.c_str(), REDIR_SYM_OUTPUT) ) { 
+                    // invalid operator
                     syntax_err = 1;
                     std::cout << "syntax error: bad operator \"" << cmd << "\"\n";
                     break;
