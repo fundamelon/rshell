@@ -494,7 +494,8 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
                 else if(redir_info->type & REDIR_TYPE_OUTPUT) {
                     _PRINT("redir: output to file " << redir_info->file)
                     int app_flag = (redir_info->type & REDIR_TYPE_OUTPUT_APP) ? O_APPEND : O_TRUNC;
-                    fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag);
+                    int perm_flag = S_IRWXU | S_IRWXG | S_IRWXO;
+                    fd_out_new = open(redir_info->file, O_CREAT | O_WRONLY | O_CLOEXEC | app_flag,  perm_flag);
                     if(fd_out_new == -1) {
                         perror("output redirect: open");
                         return errno;
