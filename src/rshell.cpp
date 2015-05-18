@@ -219,7 +219,7 @@ int run() {
                     redir_set.push_back(redir(REDIR_TYPE_INPUT | REDIR_TYPE_INPUT_STR));
                     continue; // default action
 
-                } else if(cmd == REDIR_SYM_OUTPUT) { // '>' output redirection operator
+                } else if(boost::regex_match(cmd, boost::regex("^[0-9]*>$"))) { // '>' output redirection operator
                     if(redir_i == tokens_redir.size() - 1) {
                         syntax_err = 1;
                         std::cout << "syntax error: expected file for output \">\"\n";
@@ -227,9 +227,13 @@ int run() {
                     }
 
                     redir_set.push_back(REDIR_TYPE_OUTPUT);
+                    if(cmd.size() > 1) {
+                        redir_set.back().out_fd = std::stoi(cmd.substr(0, cmd.size()-1));
+                        _PRINT(redir_set.back().out_fd)
+                    }
                     continue; // default action
 
-                } else if(cmd == REDIR_SYM_OUTPUT_APP) { // '>>' operator
+                } else if(boost::regex_match(cmd, boost::regex("^[0-9]*>>$"))) { // '>>' operator
 
                     if(redir_i == tokens_redir.size() - 1) {
                         syntax_err = 1;
@@ -238,6 +242,10 @@ int run() {
                     }
                         
                     redir_set.push_back(REDIR_TYPE_OUTPUT | REDIR_TYPE_OUTPUT_APP);
+                    if(cmd.size() > 2) {
+                        redir_set.back().out_fd = std::stoi(cmd.substr(0, cmd.size()-2));
+                        _PRINT(redir_set.back().out_fd)
+                    }
                     continue;
 
                 } else if(strstr(cmd.c_str(), REDIR_SYM_PIPE) || 
@@ -318,6 +326,7 @@ int run() {
                             const char* filepath = cmd_set.at(cmd_i + 2).c_str();
                             redir.file = filepath;
                             redir.type = redir_set.at(cmd_i+1).type;
+                            redir.out_fd = redir_set.at(cmd_i+1).out_fd;
 
                             // set to pipe if there exists a connector afterward
                             if(cmd_i + 3 < cmd_set.size() && !(redir_set.at(cmd_i+3).type == REDIR_TYPE_CMD) ) {
@@ -369,7 +378,7 @@ int run() {
 
                     _PRINT("child process terminated, pid: " << pid_child)
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
-                        if(prev_exit_code != errno) // prevent repetition of errmsgs
+                        if(prev_exit_code == errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
                         break;
                     }
@@ -425,14 +434,21 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
     bool use_redir = (redir_info != NULL);
 
-    int fd_in_old = STDIN_FILENO, fd_in_new = STDIN_FILENO; // stdin
-    int fd_out_old = STDOUT_FILENO, fd_out_new = STDOUT_FILENO; // stdout
+    int fd_in_old = STDIN_FILENO, fd_in_new = STDIN_FILENO; // default stdin
+    int fd_out_old = STDOUT_FILENO, fd_out_new = STDOUT_FILENO; // default stdout
+
+    if(redir_info != NULL) {
+        fd_out_old = redir_info->out_fd;
+        fd_out_new = redir_info->out_fd;
+    }
+    
 
     int pipefd_str[2]; // for string input
 
     if(use_redir) {
         _PRINT("execute: using redirection " << redir_info->type)
         _PRINT("redir: forwarded fd: " << *fd_fwd)
+        if(fd_out_old != STDOUT_FILENO) _PRINT("redir: output from fd " << fd_out_old)
 
         if(redir_info->type & REDIR_TYPE_PIPE) {
             // expects forwarded fd from chain
@@ -512,8 +528,8 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
             } else {
                 // end of chain override
                 _PRINT("redir: end of pipe chain")
- 
-                redir_info->file_fd = fd_out_new;
+
+                    redir_info->file_fd = fd_out_new;
                 // does not modify forwarded fd (convention)
                 fd_in_new = *fd_fwd;           
             }
@@ -547,16 +563,15 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
             // redirect stdout
             if(fd_out_old != fd_out_new) {
-                if(close(fd_out_old) == -1) {
-                    perror("output redirect: close");
-                    exit(errno);
-                }
-
                 // output to redir file
-                if(dup(fd_out_new) == -1) {
-                    perror("output redirect: dup");
+                if(dup2(fd_out_new, fd_out_old) == -1) {
+                    perror("output redirect: dup2");
                     exit(errno);
                 }
+           //     if(close(fd_out_old) == -1) {
+            //        perror("output redirect: close");
+             //       exit(errno);
+             //   }
             }
  
             if(redir_info->type & REDIR_TYPE_PIPE) {
