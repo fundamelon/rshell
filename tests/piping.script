@@ -1,0 +1,80 @@
+Script started on Mon 18 May 2015 12:48:57 AM PDT
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ bin/rshell
+[39m# priom       ls
+bin  LICENSE  makefile	README.md  src	tests
+ls -l | grep ^d > dirs.txt
+cat dirs.txt
+drwxrwxr-x 2 igi igi 4096 May 18 00:43 bin
+drwxrwxr-x 2 igi igi 4096 May 18 00:42 src
+drwxrwxr-x 2 igi igi 4096 May 18 00:48 tests
+ls    cat < dirs.txt | tr a-z A-Z | tee dirs2 1.txt | tr A-Z a-z > dirs2.txt
+cat dirs.txt
+drwxrwxr-x 2 igi igi 4096 May 18 00:43 bin
+drwxrwxr-x 2 igi igi 4096 May 18 00:42 src
+drwxrwxr-x 2 igi igi 4096 May 18 00:48 tests
+cat dirs1.txt
+DRWXRWXR-X 2 IGI IGI 4096 MAY 18 00:43 BIN
+DRWXRWXR-X 2 IGI IGI 4096 MAY 18 00:42 SRC
+DRWXRWXR-X 2 IGI IGI 4096 MAY 18 00:48 TESTS
+cat dirs2.txt
+drwxrwxr-x 2 igi igi 4096 may 18 00:43 bin
+drwxrwxr-x 2 igi igi 4096 may 18 00:42 src
+drwxrwxr-x 2 igi igi 4096 may 18 00:48 tests
+cat << string             ls -l >>  > list         > list
+cat list
+bin
+dirs1.txt
+dirs2.txt
+dirs.txt
+LICENSE
+list
+makefile
+README.md
+src
+tests
+ls >> list
+cat list
+bin
+dirs1.txt
+dirs2.txt
+dirs.txt
+LICENSE
+list
+makefile
+README.md
+src
+tests
+bin
+dirs1.txt
+dirs2.txt
+dirs.txt
+LICENSE
+list
+makefile
+README.md
+src
+tests
+cat <<< string g text
+string text
+cat <<< string gt  text | cat > test  t                               cat <<< string text | cat <>  > text.txt
+cat text.txt
+string text
+ls -z z >   2> err.txt
+cat err.txt
+ls: invalid option -- 'z'
+Try 'ls --help' for more information.
+ls 10000> er  err.txt
+output redirect: dup2: Bad file descriptor
+# will request any fd, but not all are a v originally vaoi  lid
+cat | cat | cat  cat    | cat | cat | cat | cat | cat | cat
+echo    hell lo world
+hello world
+1, 2, 3 ,4
+1, 2, 3 ,4
+ctrl-c will now exit because signals are next week
+ctrl-c will now exit because signals are next week
+^C
+]0;igi@igi-VirtualBox: ~/cs100/rshelligi@igi-VirtualBox:~/cs100/rshell$ x[Kexit
+exit
+
+Script done on Mon 18 May 2015 12:52:19 AM PDT
