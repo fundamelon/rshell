@@ -20,7 +20,7 @@
 
 
 // enable debug messages and macros
-#define RSHELL_DEBUG
+//#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND 
 #define COL_DEFAULT "\033[39m"

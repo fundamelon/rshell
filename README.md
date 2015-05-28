@@ -37,6 +37,10 @@ However, note that syntax errors with pipes are only detected at *runtime*, and 
 
 Note: ```cmd < file1 > file2``` does not function correctly, and should be avoided.
 
+#### builtins
+There is currently only one built-in function: ```cd```.
+```cd <PATH>``` takes you to the dir <PATH>, ```cd -``` takes you to the previous working directory, and ```cd``` takes you to the HOME directory.
+
 #### other
 
 When ```ls``` is invoked, the flag ```--color``` is appended to enable colors.
