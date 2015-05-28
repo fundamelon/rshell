@@ -39,7 +39,8 @@ Note: ```cmd < file1 > file2``` does not function correctly, and should be avoid
 
 #### builtins
 There is currently only one built-in function: ```cd```.
-```cd <PATH>``` takes you to the dir <PATH>, ```cd -``` takes you to the previous working directory, and ```cd``` takes you to the HOME directory.
+
+```cd <PATH>``` takes you to the dir ```<PATH>```, ```cd -``` takes you to the previous working directory, and plain ```cd``` takes you to the HOME directory.
 
 #### other
 
