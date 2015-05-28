@@ -294,6 +294,9 @@ int run() {
                     if(word == "") tokens_word.erase(tokens_word.begin() + j);
                 }
 
+                // "alias" some commands
+                if(tokens_word.at(0) == "ls") tokens_word.push_back("--color=auto");
+
                 std::vector<char*> cmd_argv(tokens_word.size() + 1);
                 for(unsigned int k = 0; k < tokens_word.size(); k++) { 
                     cmd_argv[k] = &tokens_word[k][0]; 
