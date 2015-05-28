@@ -20,10 +20,9 @@
 
 
 // enable debug messages and macros
-//#define RSHELL_DEBUG
+#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
-//#define RSHELL_PREPEND
-
+#define RSHELL_PREPEND 
 #define COL_DEFAULT "\033[39m"
 #define COL_PREPEND "\033[32m"
 #define COL_DEBUG   "\033[33m"
@@ -68,7 +67,7 @@ volatile sig_atomic_t sigint_flag = 0;
 void catch_interrupt(int sig_num) {
     sigint_flag = 1;
 }
- 
+
 
 
 /* Initialize environment */
@@ -407,12 +406,56 @@ std::string prompt() {
     std::cout << COL_DEFAULT;
 
     std::cout << getlogin() << "@" << hostname;
+
+    const char* pwd_raw;
+    if((pwd_raw = getenv("PWD")) == NULL) { perror("getenv: PWD"); return ""; }
+    const char* home_dir;
+    if((home_dir = getenv("HOME")) == NULL) { perror("getenv: HOME"); return ""; }
+
+    std::string pwd_nice = pwd_raw;
+    pwd_nice.replace(pwd_nice.find(home_dir), strlen(home_dir), "~");
+
+    std::cout << ":" << pwd_nice;
+
     std::cout << "$ " << std::flush;
 
     std::string input_raw;
     std::getline(std::cin, input_raw);
 
     return input_raw;
+}
+
+
+
+/* built-in function similar to bash's cd */
+int changedir(char* const arg) {
+
+    _PRINT("*** change directory")
+
+    char* new_path, * old_path;
+
+    if((old_path = getenv("PWD")) == NULL) { perror("getenv: PWD"); return -1; }
+
+    if(arg == NULL) {
+        if((new_path = getenv("HOME")) == NULL) { perror("getenv: HOME"); return -1; }
+    } else if(!strcmp(arg, "-")) {
+        if((new_path = getenv("OLDPWD"))==NULL) {perror("getenv: OLDPWD"); return -1;}
+    } else
+        new_path = arg;
+
+    _PRINT("changedir: new path: " << new_path)
+   
+    // change working dir
+    if(chdir(new_path) != 0) { perror("chdir"); return -1; }
+
+    // get updated working dir 
+    if((new_path = getcwd(NULL, 0)) == NULL) { perror("getcwd"); return -1; }
+    
+    // only update env variables if everything else was correct
+    if(setenv("PWD", new_path, 1) != 0) { perror("setenv: PWD"); return -1; }
+    if(setenv("OLDPWD", old_path, 1) != 0) { perror("setenv: OLDPWD"); return -1; }
+
+    return 0;
 }
 
 
@@ -429,6 +472,10 @@ int execute(const char* path, char* const argv[]) {
  *      fd_fwd: forwarded fd for chaining pipes
  */
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
+
+    // builtins redirection stage
+    if(!strcmp(argv[0], "cd"))
+        return changedir(argv[1]);
 
     _PRINT("*** execute " << path)
 

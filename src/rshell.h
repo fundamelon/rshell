@@ -21,6 +21,8 @@ int run();
 
 std::string prompt();
 
+int changedir(char* const arg);
+
 int execute(const char* path, char* const argv[]);
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]);
 
