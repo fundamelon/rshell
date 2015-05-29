@@ -20,7 +20,7 @@
 
 
 // enable debug messages and macros
-//#define RSHELL_DEBUG
+#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND 
 #define COL_DEFAULT "\033[39m"
@@ -63,8 +63,9 @@ enum REDIR_TYPE {
 
 
 
-volatile sig_atomic_t sigint_flag = 0;
-void catch_interrupt(int sig_num) {
+// interrupt handlers
+int sigint_flag = 0;
+void catch_sigint(int sig_num) {
     sigint_flag = 1;
 }
 
@@ -72,8 +73,18 @@ void catch_interrupt(int sig_num) {
 
 /* Initialize environment */
 void init() {
+    
+    // signal handling
+    struct sigaction new_action;
 
-    //signal(SIGINT, catch_interrupt);
+    sigemptyset(&new_action.sa_mask);
+    new_action.sa_flags = SA_SIGINFO;
+
+    new_action.sa_handler = catch_sigint;
+    if(sigaction(SIGINT, &new_action, NULL) == -1) { 
+        perror("sigaction: SIGINT");
+        exit(1);
+    }
 }
 
 
@@ -92,6 +103,7 @@ int run() {
     while(true) {
        
         if(sigint_flag) {  
+            std::cout << std::endl;
             _PRINT("interrupt signal recieved, ignoring")
             sigint_flag = 0;
         }
@@ -422,6 +434,7 @@ std::string prompt() {
 
     std::cout << "$ " << std::flush;
 
+    std::cin.clear();
     std::string input_raw;
     std::getline(std::cin, input_raw);
 
