@@ -64,7 +64,7 @@ enum REDIR_TYPE {
 
 
 // interrupt handlers
-int sigint_flag = 0;
+unsigned char sigint_flag = 0;
 void catch_sigint(int sig_num) {
     sigint_flag = 1;
 }
@@ -98,15 +98,13 @@ int run() {
     std::string usr_input;
     int prev_exit_code = 0;
 
+    // persistent queued process pid (ctrl-z, fg, bg)
+    int queued_pid = -1;
+
     _PRINT("starting in debug mode");
 
     while(true) {
-       
-        if(sigint_flag) {  
-            std::cout << std::endl;
-            _PRINT("interrupt signal recieved, ignoring")
-            sigint_flag = 0;
-        }
+      
 
         bool skip_cmd = false;
         std::string prev_spc = "";
@@ -131,7 +129,7 @@ int run() {
                 if(i == 0 || prev_spc != "") {  
                     std::cout << "syntax error: bad token \"" << CONN_AMP << "\"\n";
                     break;
-                } else if(prev_exit_code != 0  && i != 0) {
+                } else if(prev_exit_code <= 0  && i != 0) {
                     skip_cmd = true; 
                 }
                
@@ -143,7 +141,7 @@ int run() {
                 if(i == 0 || prev_spc != "") { 
                     std::cout << "syntax error: bad token \"" << CONN_PIPE << "\"\n";
                     break;
-                } else if(prev_exit_code == 0 && i != 0) {
+                } else if(prev_exit_code >= 0 && i != 0) {
                     skip_cmd = true;
                 } 
                 
@@ -383,23 +381,47 @@ int run() {
             }
 
             //if(prev_exit_code != 0) break;
+            
+            int recent_pid = prev_exit_code;
 
             // wait for all child processes to end and save exit code
             int pid_child;
-            while((pid_child = waitpid(-1, &prev_exit_code, 0))) {
-                if(pid_child == -1) break;
-                else {
-
+            while((pid_child = waitpid(-1, &prev_exit_code, WUNTRACED))) {
+                if(pid_child == -1) { 
+                    queued_pid = recent_pid;
+                    if(!WIFSIGNALED(prev_exit_code)) break;
+                } else {
+                    queued_pid = -1;
                     _PRINT("child process terminated, pid: " << pid_child)
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
                         if(prev_exit_code == errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
                         break;
                     }
+
+                    if(WIFSIGNALED(prev_exit_code)) {
+                        _PRINT("terminating signal: " << WTERMSIG(prev_exit_code))
+                    }
                 }
             }
-            
-            if(prev_exit_code != 0) break;
+
+            if(WIFEXITED(prev_exit_code)) queued_pid = -1; // don't queue
+            if(prev_exit_code <= 0) break;
+        }
+
+        // handle recently executed PID against signals
+        if(sigint_flag) {  
+            std::cout << std::endl;
+            _PRINT("interrupt signal recieved")
+            if(queued_pid != -1) {
+                if(kill(queued_pid, SIGINT) < 0) 
+                    perror("kill");
+                else 
+                    _PRINT("terminated process with pid: " << queued_pid)
+
+                queued_pid = -1;
+            }
+            sigint_flag = 0;
         }
     }
     
@@ -486,6 +508,7 @@ int execute(const char* path, char* const argv[]) {
 /* fork and exec a program, complete error checking
  *      redir_info: struct containing all redirection data
  *      fd_fwd: forwarded fd for chaining pipes
+ *      return value: negative error code if error, positive pid if success
  */
 int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const argv[]) {
 
@@ -680,7 +703,7 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
 
     if(use_redir) _PRINT("redir: forwarding fd " << *fd_fwd)
     _PRINT("*** execute " << path << ": success")
-    return 0;
+    return pid;
 }
 
 
