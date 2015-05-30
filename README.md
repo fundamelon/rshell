@@ -42,6 +42,9 @@ There is currently only one built-in function: ```cd```.
 
 ```cd <PATH>``` takes you to the dir ```<PATH>```, ```cd -``` takes you to the previous working directory, and plain ```cd``` takes you to the HOME directory.
 
+As in bash, ```cd``` will ignore all parameters after the first.  
+NOTE: Functionality with connectors and piping operators is UNDEFINED, UNTESTED, and should be avoided.
+
 #### other
 
 When ```ls``` is invoked, the flag ```--color``` is appended to enable colors.
