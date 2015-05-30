@@ -1,0 +1,51 @@
+Script started on Fri 29 May 2015 11:51:21 PM PDT
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ make rshell
+g++ -MMD -g -o bin/rshell bin/main.o bin/rshell.o -lboost_regex --std=c++11 -Wall -Werror -pedantic  
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ bin/rshell
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ # placeholder login name
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ # <=   - current folder displayed, home w folder collapsed
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ # CD
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ cd ..
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100$ ls
+[0m[34;42mquiz-game-tutorial[0m  [34;42mrshell[0m  [34;42mucr-cs100[0m
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100$ cd rshell
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ls
+[0m[01;32ma.out[0m  [34;42mbin[0m  [01;32mLICENSE[0m  [01;32mmakefile[0m  [01;32mREADME.md[0m  [34;42msrc[0m  [01;32mtest[0m  [34;42mtests[0m
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ cd  
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~$ ls
+[0m[34;42mcommon[0m   [01;34mDocuments[0m  examples.desktop  [01;34mPictures[0m  [01;34mPublic[0m     [01;34mVideos[0m
+[01;34mDesktop[0m  [01;34mDownloads[0m  [01;34mMusic[0m             [01;34mprograms[0m  [01;34mTemplates[0m
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~$ cd -
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ls
+[0m[01;32ma.out[0m  [34;42mbin[0m  [01;32mLICENSE[0m  [01;32mmakefile[0m  [01;32mREADME.md[0m  [34;42msrc[0m  [01;32mtest[0m  [34;42mtests[0m
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ 3 # CTR   SIGINT
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ cat
+^C
+terminate process [pid: 31268]		cat
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ cat
+hello world!
+hello world!
+^C
+terminate process [pid: 31269]		cat
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ^C
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ^C
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ^C
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ [ ps
+  PID TTY          TIME CMD
+31247 pts/1    00:00:00 bash
+31263 pts/1    00:00:00 rshell
+31270 pts/1    00:00:00 ps
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ # SIGSTOP
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ cat
+^Z
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ ps
+  PID TTY          TIME CMD
+31247 pts/1    00:00:00 bash
+31263 pts/1    00:00:00 rshell
+31271 pts/1    00:00:00 cat
+31272 pts/1    00:00:00 ps
+[32m[RSHELL] [39mlogin@igi-VirtualBox:~/common/cs100/rshell$ exit
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ exit
+exit
+
+Script done on Fri 29 May 2015 11:52:38 PM PDT

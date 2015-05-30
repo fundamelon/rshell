@@ -523,7 +523,11 @@ std::string prompt() {
 
     std::cout << COL_DEFAULT;
 
-    std::cout << getlogin() << "@" << hostname;
+    //char login[256];
+    //if(getlogin_r(login, 256) == -1)
+    //    perror("getlogin");
+
+    std::cout << "login" << "@" << hostname;
 
     const char* pwd_raw;
     if((pwd_raw = getenv("PWD")) == NULL) { perror("getenv: PWD"); return ""; }

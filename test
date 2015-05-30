@@ -1,0 +1,19 @@
+Script started on Fri 29 May 2015 11:42:02 PM PDT
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ ls
+[0m[01;32ma.out[0m  [34;42mbin[0m  [01;32mLICENSE[0m  [01;32mmakefile[0m  [01;32mREADME.md[0m  [34;42msrc[0m  [01;32mtest[0m  [34;42mtests[0m
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ a[Kmake rshell
+mkdir -p bin/
+g++ -MMD -g -c -o bin/rshell.o src/rshell.cpp --std=c++11 -Wall -Werror -pedantic 
+bin/rshellg++ -MMD -g -o bin/rshell bin/main.o bin/rshell.o -lboost_regex --std=c++11 -Wall -Werror -pedantic  
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ bin/rshell
+[32m[RSHELL] [39m8i~·t€ö¿èö¿àö¿Ï9^·X;|·@igi-VirtualBox:~/common/cs100/rshell$ ls
+[0m[01;32ma.out[0m  [34;42mbin[0m  [01;32mLICENSE[0m  [01;32mmakefile[0m  [01;32mREADME.md[0m  [34;42msrc[0m  [01;32mtest[0m  [34;42mtests[0m
+[32m[RSHELL] [39mÂ'@igi-VirtualBox:~/common/cs100/rshell$ ls
+[0m[01;32ma.out[0m  [34;42mbin[0m  [01;32mLICENSE[0m  [01;32mmakefile[0m  [01;32mREADME.md[0m  [34;42msrc[0m  [01;32mtest[0m  [34;42mtests[0m
+[32m[RSHELL] [39mÂ'@igi-VirtualBox:~/common/cs100/rshell$ ^[[A^[[A        ext it
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ bin/rshellmake rshell
+g++ -MMD -g -o bin/rshell bin/main.o bin/rshell.o -lboost_regex --std=c++11 -Wall -Werror -pedantic  
+]0;igi@igi-VirtualBox: ~/common/cs100/rshelligi@igi-VirtualBox:~/common/cs100/rshell$ exit
+exit
+
+Script done on Fri 29 May 2015 11:43:25 PM PDT
