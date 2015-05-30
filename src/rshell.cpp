@@ -20,7 +20,7 @@
 
 
 // enable debug messages and macros
-#define RSHELL_DEBUG
+//#define RSHELL_DEBUG
 // prepend "[RSHELL]" to prompt, helps to differ from bash
 #define RSHELL_PREPEND 
 #define COL_DEFAULT "\033[39m"
@@ -79,6 +79,10 @@ void catch_sigchld(int sig_num) {
     sigchld_flag = 1;
 }
 
+// fg and bg flags
+unsigned char fg_flag = 0;
+unsigned char bg_flag = 0;
+
 
 
 /* Initialize environment */
@@ -122,6 +126,9 @@ int run() {
 
     // persistent queued process pid (ctrl-z, fg, bg)
     int queued_pid = -1;
+
+    // background process pid
+    int background_pid = -1;
 
     std::vector<int> pid_list;
 
@@ -407,7 +414,7 @@ int run() {
             //if(prev_exit_code != 0) break;
             
             int recent_pid = prev_exit_code;
-            pid_list.push_back(recent_pid);
+            if(recent_pid > 0) pid_list.push_back(recent_pid);
 
             // wait for all child processes to end and save exit code
             int pid_child;
@@ -422,7 +429,13 @@ int run() {
                     _PRINT("waitpid: nonfatal error: " << strerror(errno))
                     if(!WIFSIGNALED(prev_exit_code)) 
                         break;
+                    if(pid_in_list < 1) break;
                 } else {
+                    // remove finished process from list
+                    pid_list.erase(std::remove(pid_list.begin(), pid_list.end(), queued_pid), pid_list.end());
+                    if(queued_pid == background_pid) background_pid = -1;
+                    queued_pid = -1;
+
                     if(WIFSTOPPED(prev_exit_code)) {
                         std::cout << "\nstop process [pid: ";
                         std::cout << pid_child << "]\t\t" << spc;
@@ -432,12 +445,7 @@ int run() {
                         std::cout << pid_child << "]\t\t" << spc;
                     } else // quiet message
                         _PRINT("child process terminated, pid: " << pid_child)
-                   
-                    // remove finished process from list
-                    pid_list.erase(std::remove(pid_list.begin(), pid_list.end(), queued_pid), pid_list.end());
-                    queued_pid = -1;
-
-                    if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
+                                      if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
                         if(prev_exit_code == errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
                         break;
@@ -476,7 +484,24 @@ int run() {
             // remove queued pid from pid list
             pid_list.erase(std::remove(pid_list.begin(), pid_list.end(), queued_pid), pid_list.end());
 
+            background_pid = queued_pid;
+
             sigtstp_flag = 0;
+        }
+
+        // handle fg and bg flags
+        if(fg_flag || bg_flag) {
+            _PRINT("moving process to foreground")
+            if(background_pid != -1) {
+                if(kill(background_pid, SIGCONT) < 0)
+                    perror("kill");
+                else
+                    _PRINT("continuing process with pid: " << background_pid)
+            }
+            if(fg_flag)
+                pid_list.push_back(background_pid);
+            fg_flag = 0;
+            bg_flag = 0;
         }
 
     }
@@ -571,6 +596,13 @@ int execute(struct redir* redir_info, int* fd_fwd, const char* path, char* const
     // builtins redirection stage
     if(!strcmp(argv[0], "cd"))
         return changedir(argv[1]);
+    else if(!strcmp(argv[0], "fg")) {
+        fg_flag = 1;
+        return 0;
+    } else if(!strcmp(argv[0], "bg")) {
+        bg_flag = 1;
+        return 0;
+    }
 
     _PRINT("*** execute " << path)
 
