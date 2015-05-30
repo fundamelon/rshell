@@ -63,10 +63,20 @@ enum REDIR_TYPE {
 
 
 
-// interrupt handlers
+// signal handlers
 unsigned char sigint_flag = 0;
 void catch_sigint(int sig_num) {
     sigint_flag = 1;
+}
+
+unsigned char sigtstp_flag = 0;
+void catch_sigtstp(int sig_num) {
+    sigtstp_flag = 1;
+}
+
+unsigned char sigchld_flag = 0;
+void catch_sigchld(int sig_num) {
+    sigchld_flag = 1;
 }
 
 
@@ -85,6 +95,18 @@ void init() {
         perror("sigaction: SIGINT");
         exit(1);
     }
+
+    new_action.sa_handler = catch_sigtstp;
+    if(sigaction(SIGTSTP, &new_action, NULL) == -1) {
+        perror("sigaction: SIGTSTP");
+        exit(1);
+    }
+
+    new_action.sa_handler = catch_sigchld;
+    if(sigaction(SIGCHLD, &new_action, NULL) == -1) {
+        perror("sigaction: SIGCHLD");
+        exit(1);
+    }
 }
 
 
@@ -100,6 +122,8 @@ int run() {
 
     // persistent queued process pid (ctrl-z, fg, bg)
     int queued_pid = -1;
+
+    std::vector<int> pid_list;
 
     _PRINT("starting in debug mode");
 
@@ -383,30 +407,46 @@ int run() {
             //if(prev_exit_code != 0) break;
             
             int recent_pid = prev_exit_code;
+            pid_list.push_back(recent_pid);
 
             // wait for all child processes to end and save exit code
             int pid_child;
-            while((pid_child = waitpid(-1, &prev_exit_code, WUNTRACED))) {
+            for(auto pid_in_list : pid_list)
+            while((pid_child = waitpid(pid_in_list, &prev_exit_code, WUNTRACED | WCONTINUED))) {
+                _PRINT("waitpid: process " << pid_child << " changed status")
+                queued_pid = recent_pid;
+                if(WIFSTOPPED(prev_exit_code))
+                    break;
+
                 if(pid_child == -1) { 
-                    queued_pid = recent_pid;
-                    if(!WIFSIGNALED(prev_exit_code)) break;
+                    _PRINT("waitpid: nonfatal error: " << strerror(errno))
+                    if(!WIFSIGNALED(prev_exit_code)) 
+                        break;
                 } else {
+                    if(WIFSTOPPED(prev_exit_code)) {
+                        std::cout << "\nstop process [pid: ";
+                        std::cout << pid_child << "]\t\t" << spc;
+                        break;
+                    } else if(WIFSIGNALED(prev_exit_code)) {
+                        std::cout << "\nterminate process [pid: ";
+                        std::cout << pid_child << "]\t\t" << spc;
+                    } else // quiet message
+                        _PRINT("child process terminated, pid: " << pid_child)
+                   
+                    // remove finished process from list
+                    pid_list.erase(std::remove(pid_list.begin(), pid_list.end(), queued_pid), pid_list.end());
                     queued_pid = -1;
-                    _PRINT("child process terminated, pid: " << pid_child)
+
                     if(!WIFEXITED(prev_exit_code) || WEXITSTATUS(prev_exit_code) != 0) {
                         if(prev_exit_code == errno) // prevent repetition of errmsgs
                             perror("child process: waitpid");
                         break;
                     }
-
-                    if(WIFSIGNALED(prev_exit_code)) {
-                        _PRINT("terminating signal: " << WTERMSIG(prev_exit_code))
-                    }
                 }
             }
 
             if(WIFEXITED(prev_exit_code)) queued_pid = -1; // don't queue
-            if(prev_exit_code <= 0) break;
+            if(prev_exit_code < 0) break;
         }
 
         // handle recently executed PID against signals
@@ -423,6 +463,22 @@ int run() {
             }
             sigint_flag = 0;
         }
+        
+        if(sigtstp_flag) {
+            std::cout << std::endl;
+            _PRINT("typed stop signal recieved")
+            if(queued_pid != -1) {
+                if(kill(queued_pid, SIGSTOP) < 0) // send a STOP signal fo reals
+                    perror("kill");
+                else
+                    _PRINT("stopped process with pid: " << queued_pid)
+            }
+            // remove queued pid from pid list
+            pid_list.erase(std::remove(pid_list.begin(), pid_list.end(), queued_pid), pid_list.end());
+
+            sigtstp_flag = 0;
+        }
+
     }
     
     return 0;
