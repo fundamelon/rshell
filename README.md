@@ -45,6 +45,13 @@ There is currently only one built-in function: ```cd```.
 As in bash, ```cd``` will ignore all parameters after the first.  
 NOTE: Functionality with connectors and piping operators is UNDEFINED, UNTESTED, and should be avoided.
 
+#### signal handling
+rshell can handle CTRL+C and CTRL+Z signals to terminate and stop foreground processes respectively.
+
+Behavior is UNDEFINED when using with connectors and redirection operators.
+
+The functions ```fg``` and ```bg``` can be used to manipulate the last spawned process, but there is no stack, so the next process to start will overwrite the last one, with no link back.
+
 #### other
 
 When ```ls``` is invoked, the flag ```--color``` is appended to enable colors.
